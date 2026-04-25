@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Shop – Schmuckkultur Gabriele Golzar</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400&family=Raleway:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --clr-bg: #f8f5f1;
+    --clr-text: #2a2420;
+    --clr-muted: #7a706a;
+    --clr-light: #e0d9d2;
+    --clr-border: #ddd6ce;
+    --clr-accent: #8c7355;
+    --font-serif: 'Playfair Display', Georgia, serif;
+    --font-sans: 'Raleway', Helvetica, sans-serif;
+  }
+  html { scroll-behavior: smooth; }
+  body { background: var(--clr-bg); color: var(--clr-text); font-family: var(--font-sans); font-weight: 300; }
+
+  /* PAGE HEADER */
+  .page-header {
+    padding: 56px 64px 48px;
+    border-bottom: 1px solid var(--clr-border);
+    text-align: center;
+  }
+  .page-header-label {
+    font-size: 9px; letter-spacing: 0.32em;
+    text-transform: uppercase; color: var(--clr-accent);
+    margin-bottom: 14px; font-weight: 400;
+  }
+  .page-header h1 {
+    font-family: var(--font-serif);
+    font-size: clamp(34px, 5vw, 60px);
+    font-weight: 400; line-height: 1.1;
+    margin-bottom: 18px;
+  }
+  .page-header p {
+    font-size: 14px; line-height: 1.85;
+    color: var(--clr-muted); max-width: 640px; margin: 0 auto;
+  }
+
+  /* CATEGORY GRID */
+  .kat-grid-wrap {
+    padding: 64px 48px 96px;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+  .kat-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 28px 24px;
+  }
+  .kat-card {
+    text-decoration: none;
+    color: inherit;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    cursor: pointer;
+    transition: transform 0.3s;
+  }
+  .kat-card:hover { transform: translateY(-3px); }
+  .kat-card-img {
+    width: 100%;
+    aspect-ratio: 1;
+    overflow: hidden;
+    background: #e8e3dd;
+    position: relative;
+  }
+  .kat-card-img img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s, filter 0.4s;
+    filter: grayscale(15%);
+  }
+  .kat-card:hover .kat-card-img img {
+    transform: scale(1.06);
+    filter: grayscale(0%);
+  }
+  .kat-card-img-ph {
+    width: 100%; height: 100%;
+    background: linear-gradient(135deg, #ede8e3 0%, #d8d2cb 100%);
+    display: flex; align-items: center; justify-content: center;
+    color: rgba(0,0,0,0.18); font-family: var(--font-serif);
+    font-size: 32px;
+  }
+  .kat-card-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to bottom, transparent 50%, rgba(20,16,12,0.5) 100%);
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  .kat-card:hover .kat-card-overlay { opacity: 1; }
+  .kat-card-meta {
+    display: flex; flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    text-align: center;
+  }
+  .kat-card-label {
+    font-family: var(--font-serif);
+    font-size: 18px;
+    font-weight: 400;
+    color: var(--clr-text);
+    transition: color 0.2s;
+  }
+  .kat-card:hover .kat-card-label { color: var(--clr-accent); }
+  .kat-card-cta {
+    font-size: 9px;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: var(--clr-accent);
+    font-weight: 400;
+  }
+
+  @media (max-width: 1100px) { .kat-grid { grid-template-columns: repeat(3, 1fr); } }
+  @media (max-width: 800px) {
+    .kat-grid { grid-template-columns: repeat(2, 1fr); gap: 20px 16px; }
+    .kat-grid-wrap { padding: 40px 20px 64px; }
+    .page-header { padding: 40px 20px 36px; }
+  }
+</style>
+</head>
+<body>
+
+<script src="nav.js?v=7"></script>
+<site-nav active="shop"></site-nav>
+
+<!-- PAGE HEADER -->
+<div class="page-header">
+  <p class="page-header-label">Unsere Kollektion</p>
+  <h1>Shop</h1>
+  <p>Entdecken Sie unsere handverlesenen Kategorien — von edlen Ringen über Perlen bis hin zu außergewöhnlichem Atelierschmuck.</p>
+</div>
+
+<!-- CATEGORY GRID -->
+<div class="kat-grid-wrap">
+  <div class="kat-grid" id="kat-grid"></div>
+</div>
+
+<!-- FOOTER -->
+<script src="footer.js?v=1"></script>
+<site-footer></site-footer>
+
+<script>
+const KATEGORIEN = [
+  { slug: 'ringe',           label: 'Ringe',          img: 'ringe',        ext: 'jpg' },
+  { slug: 'trauringe',       label: 'Trauringe',      img: 'trauringe',    ext: 'jpg' },
+  { slug: 'verlobungsringe', label: 'Verlobungsringe',img: 'verlobung',    ext: 'jpg' },
+  { slug: 'halsschmuck',     label: 'Halsschmuck',    img: 'halsschmuck',  ext: 'jpg' },
+  { slug: 'ohrschmuck',      label: 'Ohrschmuck',     img: 'ohrschmuck',   ext: 'jpg' },
+  { slug: 'perlen',          label: 'Perlen',         img: 'perlen',       ext: 'jpg' },
+  { slug: 'uhren',           label: 'Uhren',          img: 'uhren',        ext: 'jpg' },
+  { slug: 'armschmuck',      label: 'Armschmuck',     img: 'armschmuck',   ext: 'png' },
+  { slug: 'maennersache',    label: 'Männersache',    img: 'maennersache', ext: 'png' },
+  { slug: 'atelierschmuck',  label: 'Atelierschmuck', img: 'atelier',      ext: 'jpg' },
+];
+
+document.getElementById('kat-grid').innerHTML = KATEGORIEN.map(k =>
+  '<a class="kat-card" href="shop/' + k.slug + '.html">' +
+    '<div class="kat-card-img">' +
+      '<img src="images/kategorien/' + k.img + '.' + k.ext + '" alt="' + k.label + '" onerror="this.parentElement.innerHTML=\'<div class=\\\'kat-card-img-ph\\\'>' + k.label + '</div>\'">' +
+      '<div class="kat-card-overlay"></div>' +
+    '</div>' +
+    '<div class="kat-card-meta">' +
+      '<span class="kat-card-label">' + k.label + '</span>' +
+      '<span class="kat-card-cta">Entdecken →</span>' +
+    '</div>' +
+  '</a>'
+).join('');
+</script>
+
+</body>
+</html>

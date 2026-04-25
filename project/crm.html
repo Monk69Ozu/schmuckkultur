@@ -1,0 +1,828 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin – Schmuckkultur</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;1,400&family=Raleway:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --clr-bg: #f8f5f1; --clr-text: #2a2420; --clr-muted: #7a706a;
+    --clr-light: #e0d9d2; --clr-border: #ddd6ce; --clr-accent: #8c7355;
+    --clr-dark: #1e1b18;
+    --font-serif: 'Playfair Display', Georgia, serif;
+    --font-sans: 'Raleway', Helvetica, sans-serif;
+  }
+  body { background: var(--clr-bg); color: var(--clr-text); font-family: var(--font-sans); font-weight: 300; min-height: 100vh; }
+
+  /* LOGIN SCREEN */
+  .login-screen {
+    min-height: 100vh; display: flex; align-items: center; justify-content: center;
+    background: var(--clr-dark);
+  }
+  .login-box {
+    background: var(--clr-bg); padding: 56px 48px; width: 380px;
+    text-align: center;
+  }
+  .login-title { font-family: var(--font-serif); font-size: 26px; font-weight: 400; margin-bottom: 8px; }
+  .login-sub { font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--clr-accent); margin-bottom: 36px; }
+  .login-field { width: 100%; border: none; border-bottom: 1px solid var(--clr-border); padding: 12px 0; font-size: 14px; font-family: var(--font-sans); background: transparent; outline: none; color: var(--clr-text); transition: border-color 0.2s; text-align: center; letter-spacing: 0.1em; }
+  .login-field:focus { border-color: var(--clr-accent); }
+  .login-btn { margin-top: 28px; width: 100%; padding: 14px; background: var(--clr-text); color: #fff; border: none; font-family: var(--font-sans); font-size: 10px; letter-spacing: 0.22em; text-transform: uppercase; cursor: pointer; transition: background 0.2s; font-weight: 400; }
+  .login-btn:hover { background: var(--clr-accent); }
+  .login-error { color: #c0392b; font-size: 12px; margin-top: 12px; display: none; }
+
+  /* ADMIN LAYOUT */
+  .admin-wrap { display: none; }
+  .admin-topbar {
+    background: var(--clr-dark); color: rgba(255,255,255,0.8);
+    padding: 0 32px; height: 52px;
+    display: flex; align-items: center; justify-content: space-between;
+    font-size: 11px; letter-spacing: 0.12em;
+  }
+  .admin-topbar-left { font-family: var(--font-serif); font-size: 15px; font-weight: 400; }
+  .admin-topbar-right { display: flex; gap: 20px; align-items: center; }
+  .admin-topbar a { color: rgba(255,255,255,0.5); text-decoration: none; font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; transition: color 0.2s; }
+  .admin-topbar a:hover { color: #fff; }
+  .logout-btn { background: none; border: 1px solid rgba(255,255,255,0.25); color: rgba(255,255,255,0.6); padding: 5px 14px; font-size: 9px; letter-spacing: 0.18em; text-transform: uppercase; cursor: pointer; font-family: var(--font-sans); transition: all 0.2s; }
+  .logout-btn:hover { border-color: #fff; color: #fff; }
+
+  .admin-body { display: grid; grid-template-columns: 220px 1fr; min-height: calc(100vh - 52px); }
+
+  /* SIDEBAR */
+  .admin-sidebar {
+    background: #fff; border-right: 1px solid var(--clr-border);
+    padding: 32px 0;
+  }
+  .sidebar-section { margin-bottom: 8px; }
+  .sidebar-label { font-size: 8px; letter-spacing: 0.28em; text-transform: uppercase; color: var(--clr-muted); padding: 8px 24px 4px; font-weight: 400; }
+  .sidebar-link {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 24px; font-size: 12px; color: var(--clr-muted);
+    cursor: pointer; transition: all 0.15s; text-decoration: none;
+    border-left: 2px solid transparent; font-weight: 400;
+  }
+  .sidebar-link:hover { color: var(--clr-text); background: var(--clr-bg); }
+  .sidebar-link.active { color: var(--clr-accent); border-left-color: var(--clr-accent); background: rgba(140,115,85,0.04); font-weight: 500; }
+  .sidebar-icon { width: 14px; height: 14px; opacity: 0.6; }
+
+  /* MAIN CONTENT */
+  .admin-main { padding: 36px 40px; background: var(--clr-bg); }
+  .admin-page { display: none; }
+  .admin-page.active { display: block; }
+
+  /* STATS ROW */
+  .stats-row { display: grid; grid-template-columns: repeat(4,1fr); gap: 16px; margin-bottom: 36px; }
+  .stat-card { background: #fff; border: 1px solid var(--clr-border); padding: 24px; }
+  .stat-num { font-family: var(--font-serif); font-size: 36px; font-weight: 400; line-height: 1; margin-bottom: 6px; }
+  .stat-label { font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--clr-muted); }
+
+  /* SECTION HEADER */
+  .section-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
+  .section-head h2 { font-family: var(--font-serif); font-size: 24px; font-weight: 400; }
+
+  /* BTN */
+  .btn { font-family: var(--font-sans); font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase; padding: 10px 22px; border: 1px solid currentColor; cursor: pointer; transition: all 0.2s; font-weight: 400; }
+  .btn-primary { background: var(--clr-text); color: #fff; border-color: var(--clr-text); }
+  .btn-primary:hover { background: var(--clr-accent); border-color: var(--clr-accent); }
+  .btn-outline { background: transparent; color: var(--clr-text); }
+  .btn-outline:hover { background: var(--clr-text); color: #fff; }
+  .btn-danger { background: transparent; color: #c0392b; border-color: #c0392b; }
+  .btn-danger:hover { background: #c0392b; color: #fff; }
+  .btn-sm { padding: 6px 14px; font-size: 8px; }
+
+  /* PRODUCT TABLE */
+  .product-table { width: 100%; border-collapse: collapse; background: #fff; }
+  .product-table th { font-size: 8px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--clr-muted); padding: 12px 16px; text-align: left; border-bottom: 1px solid var(--clr-border); font-weight: 400; }
+  .product-table td { padding: 14px 16px; border-bottom: 1px solid var(--clr-border); font-size: 13px; vertical-align: middle; }
+  .product-table tr:last-child td { border-bottom: none; }
+  .product-table tr:hover td { background: var(--clr-bg); }
+  .product-thumb { width: 44px; height: 44px; object-fit: cover; background: var(--clr-light); display: block; }
+  .product-thumb-ph { width: 44px; height: 44px; background: var(--clr-light); display: block; }
+  .tag { display: inline-block; font-size: 8px; letter-spacing: 0.14em; text-transform: uppercase; padding: 3px 8px; background: rgba(140,115,85,0.1); color: var(--clr-accent); border-radius: 2px; }
+
+  /* MODAL */
+  .modal-overlay {
+    display: none; position: fixed; inset: 0; z-index: 900;
+    background: rgba(20,16,12,0.55); backdrop-filter: blur(3px);
+    align-items: center; justify-content: center;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal { background: var(--clr-bg); width: 560px; max-height: 90vh; overflow-y: auto; position: relative; }
+  .modal-header { padding: 28px 32px 20px; border-bottom: 1px solid var(--clr-border); display: flex; align-items: center; justify-content: space-between; }
+  .modal-header h3 { font-family: var(--font-serif); font-size: 22px; font-weight: 400; }
+  .modal-close { background: none; border: none; font-size: 22px; cursor: pointer; color: var(--clr-muted); line-height: 1; }
+  .modal-close:hover { color: var(--clr-text); }
+  .modal-body { padding: 28px 32px; }
+  .modal-footer { padding: 20px 32px; border-top: 1px solid var(--clr-border); display: flex; gap: 12px; justify-content: flex-end; }
+
+  /* FORM */
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .form-group { display: flex; flex-direction: column; gap: 6px; }
+  .form-group.full { grid-column: 1 / -1; }
+  .form-group label { font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--clr-muted); }
+  .form-group input, .form-group select, .form-group textarea {
+    font-family: var(--font-sans); font-size: 13px; font-weight: 300;
+    border: none; border-bottom: 1px solid var(--clr-border);
+    padding: 9px 0; background: transparent; outline: none;
+    color: var(--clr-text); transition: border-color 0.2s;
+    -webkit-appearance: none;
+  }
+  .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--clr-accent); }
+  .form-group textarea { resize: none; height: 80px; }
+  .form-check { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--clr-muted); margin-top: 4px; }
+  .form-check input { width: auto; }
+
+  /* IMAGE UPLOAD PREVIEW */
+  .img-upload-area {
+    border: 1px dashed var(--clr-border); padding: 20px; text-align: center;
+    cursor: pointer; transition: border-color 0.2s; position: relative;
+  }
+  .img-upload-area:hover { border-color: var(--clr-accent); }
+  .img-upload-area input[type=file] { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+  .img-preview { width: 80px; height: 80px; object-fit: cover; margin: 0 auto 8px; display: block; }
+  .img-upload-label { font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--clr-muted); }
+
+  /* EMPTY TABLE */
+  .empty-table { padding: 60px; text-align: center; color: var(--clr-muted); background: #fff; }
+  .empty-table p { font-size: 14px; line-height: 1.8; }
+
+  @media (max-width: 800px) {
+    .admin-body { grid-template-columns: 1fr; }
+    .admin-sidebar { display: none; }
+    .stats-row { grid-template-columns: 1fr 1fr; }
+    .form-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div class="login-screen" id="login-screen">
+  <div class="login-box">
+    <h1 class="login-title">Admin</h1>
+    <p class="login-sub">Schmuckkultur Gabriele Golzar</p>
+    <input class="login-field" type="password" id="pw-input" placeholder="Passwort" onkeydown="if(event.key==='Enter') doLogin()">
+    <button class="login-btn" onclick="doLogin()">Einloggen</button>
+    <p class="login-error" id="login-error">Falsches Passwort</p>
+  </div>
+</div>
+
+<!-- ADMIN -->
+<div class="admin-wrap" id="admin-wrap">
+  <div class="admin-topbar">
+    <span class="admin-topbar-left">Schmuckkultur · Admin</span>
+    <div class="admin-topbar-right">
+      <a href="shop.html" target="_blank">Shop ansehen</a>
+      <a href="index.html" target="_blank">Website</a>
+      <button class="logout-btn" onclick="doLogout()">Abmelden</button>
+    </div>
+  </div>
+  <div class="admin-body">
+    <!-- SIDEBAR -->
+    <div class="admin-sidebar">
+      <div class="sidebar-section">
+        <div class="sidebar-label">Übersicht</div>
+        <a class="sidebar-link active" onclick="showPage('dashboard', this)">
+          <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+          Dashboard
+        </a>
+      </div>
+      <div class="sidebar-section">
+        <div class="sidebar-label">Shop</div>
+        <a class="sidebar-link" onclick="showPage('produkte', this)">
+          <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="3"/><path d="M12 2v4M12 18v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M2 12h4M18 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>
+          Produkte
+        </a>
+      </div>
+      <div class="sidebar-section">
+        <div class="sidebar-label">Einstellungen</div>
+        <a class="sidebar-link" onclick="showPage('einstellungen', this)">
+          <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+          Einstellungen
+        </a>
+      </div>
+    </div>
+
+    <!-- MAIN -->
+    <div class="admin-main">
+
+      <!-- DASHBOARD -->
+      <div class="admin-page active" id="page-dashboard">
+        <div class="section-head"><h2>Dashboard</h2></div>
+        <!-- CONNECTION CHECK -->
+        <div id="connection-check" style="margin-bottom:24px;padding:16px 20px;border:1px solid var(--clr-border);background:#fff;display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+          <div id="conn-dot" style="width:10px;height:10px;border-radius:50%;background:#ccc;flex-shrink:0"></div>
+          <div>
+            <div style="font-size:12px;font-weight:500" id="conn-title">Shop-Verbindung wird geprüft…</div>
+            <div style="font-size:11px;color:var(--clr-muted)" id="conn-sub"></div>
+          </div>
+          <a href="shop.html" target="_blank" class="btn btn-outline btn-sm" style="margin-left:auto">Shop öffnen</a>
+        </div>
+        <div class="stats-row">
+          <div class="stat-card"><div class="stat-num" id="stat-total">0</div><div class="stat-label">Produkte gesamt</div></div>
+          <div class="stat-card"><div class="stat-num" id="stat-neu">0</div><div class="stat-label">Neu markiert</div></div>
+          <div class="stat-card"><div class="stat-num" id="stat-kat">0</div><div class="stat-label">Kategorien</div></div>
+          <div class="stat-card"><div class="stat-num" id="stat-designer">0</div><div class="stat-label">Designer</div></div>
+        </div>
+        <div class="section-head"><h2>Zuletzt hinzugefügt</h2></div>
+        <table class="product-table" id="recent-table">
+          <thead><tr><th>Foto</th><th>Name</th><th>Designer</th><th>Kategorie</th><th>Preis</th></tr></thead>
+          <tbody id="recent-tbody"></tbody>
+        </table>
+      </div>
+
+      <!-- PRODUKTE -->
+      <div class="admin-page" id="page-produkte">
+        <div class="section-head">
+          <h2>Produkte</h2>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <label class="btn btn-outline" style="cursor:pointer">
+              CSV importieren
+              <input type="file" accept=".csv" onchange="importCSVQuick(this)" style="display:none">
+            </label>
+            <button class="btn btn-primary" onclick="openModal()">+ Produkt hinzufügen</button>
+          </div>
+        </div>
+        <table class="product-table">
+          <thead><tr><th>Foto</th><th>Name</th><th>Designer</th><th>Kategorie</th><th>Preis</th><th>Neu</th><th></th></tr></thead>
+          <tbody id="products-tbody"></tbody>
+        </table>
+        <div class="empty-table" id="products-empty" style="display:none">
+          <p>Noch keine Produkte vorhanden.<br>Klicke auf „+ Produkt hinzufügen" um zu starten.</p>
+        </div>
+      </div>
+
+      <!-- EINSTELLUNGEN -->
+      <div class="admin-page" id="page-einstellungen">
+        <div class="section-head"><h2>Einstellungen</h2></div>
+        <div style="background:#fff;border:1px solid var(--clr-border);padding:32px;max-width:480px;">
+          <div class="form-group" style="margin-bottom:20px">
+            <label>Passwort ändern</label>
+            <input type="password" id="new-pw" placeholder="Neues Passwort">
+          </div>
+          <div class="form-group" style="margin-bottom:24px">
+            <label>Passwort bestätigen</label>
+            <input type="password" id="confirm-pw" placeholder="Wiederholen">
+          </div>
+          <button class="btn btn-primary" onclick="changePw()">Passwort speichern</button>
+          <p id="pw-msg" style="font-size:12px;margin-top:12px;color:var(--clr-accent);display:none">Passwort gespeichert!</p>
+          <hr style="margin:32px 0;border-color:var(--clr-border)">
+          <div class="form-group" style="margin-bottom:12px">
+            <label>Produkte als Datei sichern</label>
+          </div>
+          <p style="font-size:12px;color:var(--clr-muted);margin-bottom:16px;line-height:1.7">
+            Lädt <strong>products-data.json</strong> herunter. Diese Datei ins Projekt-Root hochladen — dann werden Produkte auch nach einem Website-Update automatisch wiederhergestellt.
+          </p>
+          <button class="btn btn-primary" onclick="saveToFile(false);markSaved();">Als products-data.json speichern</button>
+          <p id="save-file-msg" style="display:none;font-size:12px;color:#27ae60;margin-top:10px">✓ Datei heruntergeladen — bitte ins Projekt hochladen.</p>
+          <hr style="margin:32px 0;border-color:var(--clr-border)">
+          <div class="form-group" style="margin-bottom:12px">
+            <label>Produkte als Datei sichern</label>
+          </div>
+          <p style="font-size:12px;color:var(--clr-muted);margin-bottom:16px;line-height:1.7">
+            Lädt <strong>products-data.json</strong> herunter. Diese Datei ins Projekt-Root hochladen — dann werden Produkte auch nach einem Website-Update automatisch wiederhergestellt.
+          </p>
+          <button class="btn btn-primary" onclick="saveToFile(false);markSaved();">Als products-data.json speichern</button>
+          <p id="save-file-msg" style="display:none;font-size:12px;color:#27ae60;margin-top:10px">✓ Datei heruntergeladen — bitte ins Projekt hochladen.</p>
+          <hr style="margin:32px 0;border-color:var(--clr-border)">
+          <div class="form-group" style="margin-bottom:20px">
+            <label>Alle Produkte exportieren (JSON)</label>
+          </div>
+          <button class="btn btn-outline" onclick="exportProducts()">Export herunterladen</button>
+          <hr style="margin:32px 0;border-color:var(--clr-border)">
+          <div class="form-group" style="margin-bottom:20px">
+            <label>Produkte importieren (JSON)</label>
+            <input type="file" id="import-file" accept=".json" onchange="importProducts(this)">
+          </div>
+          <hr style="margin:32px 0;border-color:var(--clr-border)">
+          <div class="form-group" style="margin-bottom:12px">
+            <label>CSV-Import (Framer/Shop-Export)</label>
+          </div>
+          <p style="font-size:12px;color:var(--clr-muted);margin-bottom:16px;line-height:1.7">
+            Spalten werden automatisch erkannt:<br>
+            <strong>Product Name, Price, Image 1, Product Number, Kategorie, Designer Link, Short Description, Featured</strong>
+          </p>
+          <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-bottom:12px">
+            <label style="display:flex;align-items:center;gap:8px;font-size:12px;color:var(--clr-muted);cursor:pointer">
+              <input type="radio" name="csv-mode" value="append" checked> Hinzufügen (bestehende behalten)
+            </label>
+            <label style="display:flex;align-items:center;gap:8px;font-size:12px;color:var(--clr-muted);cursor:pointer">
+              <input type="radio" name="csv-mode" value="replace"> Ersetzen (alles löschen)
+            </label>
+          </div>
+          <input type="file" id="csv-file" accept=".csv" onchange="importCSV(this)" style="margin-bottom:12px">
+          <div id="csv-result" style="display:none;margin-top:12px;padding:14px 16px;background:#f0faf0;border:1px solid #c3e6cb;font-size:13px;color:#2d6a2d;line-height:1.7"></div>
+          <div id="csv-error"  style="display:none;margin-top:12px;padding:14px 16px;background:#fff0f0;border:1px solid #f5c6c6;font-size:13px;color:#8b1a1a;line-height:1.7"></div>
+        </div>
+      </div>
+
+    </div><!-- /admin-main -->
+  </div><!-- /admin-body -->
+</div><!-- /admin-wrap -->
+
+<!-- PRODUCT MODAL -->
+<div class="modal-overlay" id="product-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="modal-title">Produkt hinzufügen</h3>
+      <button class="modal-close" onclick="closeModal()">×</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="edit-idx" value="-1">
+      <div class="form-grid">
+        <div class="form-group full">
+          <label>Foto</label>
+          <div class="img-upload-area" id="img-upload-area">
+            <input type="file" accept="image/*" onchange="handleImgUpload(this)">
+            <img id="img-preview" class="img-preview" alt="" style="display:none">
+            <p class="img-upload-label" id="img-upload-label">Bild auswählen oder ablegen</p>
+          </div>
+          <input type="hidden" id="field-foto">
+        </div>
+        <div class="form-group">
+          <label>Name *</label>
+          <input type="text" id="field-name" placeholder="z.B. Ring Silber">
+        </div>
+        <div class="form-group">
+          <label>Designer</label>
+          <input type="text" id="field-designer" placeholder="z.B. Niessing">
+        </div>
+        <div class="form-group">
+          <label>Kategorie</label>
+          <select id="field-kategorie">
+            <option value="">Bitte wählen</option>
+            <option>Ringe</option><option>Trauringe</option><option>Verlobungsringe</option>
+            <option>Halsschmuck</option><option>Ohrschmuck</option><option>Perlen</option>
+            <option>Uhren</option><option>Armschmuck</option><option>Männersache</option>
+            <option>Atelierschmuck</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Preis (€) – leer = Auf Anfrage</label>
+          <input type="number" id="field-preis" placeholder="z.B. 890">
+        </div>
+        <div class="form-group">
+          <label>Artikelnummer</label>
+          <input type="text" id="field-artikelnr" placeholder="z.B. RG-001">
+        </div>
+        <div class="form-group full">
+          <label>Beschreibung</label>
+          <textarea id="field-beschreibung" placeholder="Kurze Beschreibung des Schmuckstücks…"></textarea>
+        </div>
+        <div class="form-group full">
+          <label class="form-check">
+            <input type="checkbox" id="field-neu"> Als „Neu" markieren
+          </label>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal()">Abbrechen</button>
+      <button class="btn btn-primary" onclick="saveProduct()">Speichern</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const PASS_KEY = 'schmuck_admin_pw';
+const PRODUCTS_KEY = 'schmuck_products';
+const DEFAULT_PW = 'schmuck2025';
+
+// ── LOAD FROM products-data.json as fallback ──
+async function loadFromJsonFallback() {
+  try {
+    const existing = JSON.parse(localStorage.getItem(PRODUCTS_KEY) || '[]');
+    if (existing.length > 0) return; // localStorage already has data, skip
+    const res = await fetch('products-data.json?t=' + Date.now());
+    if (!res.ok) return;
+    const data = await res.json();
+    if (Array.isArray(data) && data.length > 0) {
+      localStorage.setItem(PRODUCTS_KEY, JSON.stringify(data));
+      console.log('Produkte aus products-data.json geladen:', data.length);
+      if (sessionStorage.getItem('admin_auth')) refreshAll();
+    }
+  } catch(e) { /* silent */ }
+}
+loadFromJsonFallback();
+
+// ── SAVE TO FILE (download) ──
+function saveToFile(silent) {
+  const data = localStorage.getItem(PRODUCTS_KEY) || '[]';
+  const blob = new Blob([data], {type: 'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'products-data.json';
+  a.click();
+  if (!silent) {
+    const msg = document.getElementById('save-file-msg');
+    if (msg) { msg.style.display = 'block'; setTimeout(() => msg.style.display = 'none', 4000); }
+  }
+}
+
+// ── UNSAVED CHANGES INDICATOR ──
+let _unsavedChanges = false;
+function markUnsaved() {
+  _unsavedChanges = true;
+  const badge = document.getElementById('unsaved-badge');
+  if (badge) badge.style.display = 'inline-flex';
+}
+function markSaved() {
+  _unsavedChanges = false;
+  const badge = document.getElementById('unsaved-badge');
+  if (badge) badge.style.display = 'none';
+}
+
+// ── AUTH ──
+function getPassword() { return localStorage.getItem(PASS_KEY) || DEFAULT_PW; }
+function doLogin() {
+  const val = document.getElementById('pw-input').value;
+  if (val === getPassword()) {
+    sessionStorage.setItem('admin_auth', '1');
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('admin-wrap').style.display = 'block';
+    refreshAll();
+  } else {
+    document.getElementById('login-error').style.display = 'block';
+    document.getElementById('pw-input').value = '';
+  }
+}
+function doLogout() {
+  sessionStorage.removeItem('admin_auth');
+  location.reload();
+}
+function changePw() {
+  const np = document.getElementById('new-pw').value;
+  const cp = document.getElementById('confirm-pw').value;
+  if (!np) return;
+  if (np !== cp) { alert('Passwörter stimmen nicht überein.'); return; }
+  localStorage.setItem(PASS_KEY, np);
+  document.getElementById('pw-msg').style.display = 'block';
+  document.getElementById('new-pw').value = '';
+  document.getElementById('confirm-pw').value = '';
+}
+if (sessionStorage.getItem('admin_auth')) {
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('admin-wrap').style.display = 'block';
+}
+
+// ── NAVIGATION ──
+function showPage(id, el) {
+  document.querySelectorAll('.admin-page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
+  if (el) el.classList.add('active');
+  if (id === 'dashboard') refreshDashboard();
+  if (id === 'produkte') renderProductsTable();
+}
+
+// ── PRODUCTS ──
+function getProducts() {
+  try { return JSON.parse(localStorage.getItem(PRODUCTS_KEY) || '[]'); } catch(e) { return []; }
+}
+function saveProducts(arr) { localStorage.setItem(PRODUCTS_KEY, JSON.stringify(arr)); }
+
+function refreshAll() { refreshDashboard(); renderProductsTable(); }
+
+function refreshDashboard() {
+  const prods = getProducts();
+  document.getElementById('stat-total').textContent = prods.length;
+  document.getElementById('stat-neu').textContent = prods.filter(p => p.neu).length;
+  const kats = [...new Set(prods.map(p => p.kategorie).filter(Boolean))];
+  document.getElementById('stat-kat').textContent = kats.length;
+  const designers = [...new Set(prods.map(p => p.designer).filter(Boolean))];
+  document.getElementById('stat-designer').textContent = designers.length;
+
+  const recent = [...prods].slice(-5).reverse();
+  document.getElementById('recent-tbody').innerHTML = recent.length ? recent.map(p =>
+    `<tr>
+      <td>${p.foto ? `<img src="${p.foto}" class="product-thumb" alt="">` : `<div class="product-thumb-ph"></div>`}</td>
+      <td>${p.name}</td>
+      <td>${p.designer || '—'}</td>
+      <td>${p.kategorie ? `<span class="tag">${p.kategorie}</span>` : '—'}</td>
+      <td>${p.preis ? p.preis + ' €' : '—'}</td>
+    </tr>`
+  ).join('') : '<tr><td colspan="5" style="padding:24px;text-align:center;color:var(--clr-muted)">Noch keine Produkte</td></tr>';
+}
+
+function renderProductsTable() {
+  const prods = getProducts();
+  const tbody = document.getElementById('products-tbody');
+  const empty = document.getElementById('products-empty');
+  if (prods.length === 0) {
+    tbody.innerHTML = '';
+    empty.style.display = 'block';
+    return;
+  }
+  empty.style.display = 'none';
+  tbody.innerHTML = prods.map((p, i) => `
+    <tr>
+      <td>${p.foto ? `<img src="${p.foto}" class="product-thumb" alt="">` : `<div class="product-thumb-ph"></div>`}</td>
+      <td><strong>${p.name}</strong>${p.artikelnr ? `<br><small style="color:var(--clr-muted)">${p.artikelnr}</small>` : ''}</td>
+      <td>${p.designer || '—'}</td>
+      <td>${p.kategorie ? `<span class="tag">${p.kategorie}</span>` : '—'}</td>
+      <td>${p.preis ? p.preis + ' €' : 'Auf Anfrage'}</td>
+      <td>${p.neu ? '✓' : ''}</td>
+      <td style="white-space:nowrap">
+        <button class="btn btn-outline btn-sm" onclick="editProduct(${i})">Bearbeiten</button>
+        <button class="btn btn-danger btn-sm" style="margin-left:6px" onclick="deleteProduct(${i})">Löschen</button>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function deleteProduct(idx) {
+  if (!confirm('Produkt wirklich löschen?')) return;
+  const prods = getProducts();
+  prods.splice(idx, 1);
+  saveProducts(prods);
+  renderProductsTable();
+  refreshDashboard();
+  checkShopConnection();
+  markUnsaved();
+}
+
+// ── MODAL ──
+function openModal(idx) {
+  resetModal();
+  if (idx !== undefined) {
+    const p = getProducts()[idx];
+    document.getElementById('modal-title').textContent = 'Produkt bearbeiten';
+    document.getElementById('edit-idx').value = idx;
+    document.getElementById('field-name').value = p.name || '';
+    document.getElementById('field-designer').value = p.designer || '';
+    document.getElementById('field-kategorie').value = p.kategorie || '';
+    document.getElementById('field-preis').value = p.preis || '';
+    document.getElementById('field-artikelnr').value = p.artikelnr || '';
+    document.getElementById('field-beschreibung').value = p.beschreibung || '';
+    document.getElementById('field-neu').checked = !!p.neu;
+    document.getElementById('field-foto').value = p.foto || '';
+    if (p.foto) {
+      document.getElementById('img-preview').src = p.foto;
+      document.getElementById('img-preview').style.display = 'block';
+      document.getElementById('img-upload-label').textContent = 'Bild ändern';
+    }
+  }
+  document.getElementById('product-modal').classList.add('open');
+}
+function editProduct(idx) { openModal(idx); }
+function closeModal() {
+  document.getElementById('product-modal').classList.remove('open');
+  resetModal();
+}
+function resetModal() {
+  document.getElementById('modal-title').textContent = 'Produkt hinzufügen';
+  document.getElementById('edit-idx').value = '-1';
+  ['field-name','field-designer','field-preis','field-artikelnr','field-beschreibung','field-foto'].forEach(id => { document.getElementById(id).value = ''; });
+  document.getElementById('field-kategorie').value = '';
+  document.getElementById('field-neu').checked = false;
+  document.getElementById('img-preview').style.display = 'none';
+  document.getElementById('img-upload-label').textContent = 'Bild auswählen oder ablegen';
+}
+function saveProduct() {
+  const name = document.getElementById('field-name').value.trim();
+  if (!name) { alert('Bitte einen Namen eingeben.'); return; }
+  const product = {
+    name,
+    designer: document.getElementById('field-designer').value.trim(),
+    kategorie: document.getElementById('field-kategorie').value,
+    preis: document.getElementById('field-preis').value.trim(),
+    artikelnr: document.getElementById('field-artikelnr').value.trim(),
+    beschreibung: document.getElementById('field-beschreibung').value.trim(),
+    neu: document.getElementById('field-neu').checked,
+    foto: document.getElementById('field-foto').value,
+    erstellt: new Date().toISOString()
+  };
+  const prods = getProducts();
+  const idx = parseInt(document.getElementById('edit-idx').value);
+  if (idx >= 0) { prods[idx] = { ...prods[idx], ...product }; }
+  else { prods.push(product); }
+  saveProducts(prods);
+  closeModal();
+  renderProductsTable();
+  refreshDashboard();
+  checkShopConnection();
+  markUnsaved();
+}
+function handleImgUpload(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    const data = e.target.result;
+    document.getElementById('field-foto').value = data;
+    document.getElementById('img-preview').src = data;
+    document.getElementById('img-preview').style.display = 'block';
+    document.getElementById('img-upload-label').textContent = file.name;
+  };
+  reader.readAsDataURL(file);
+}
+document.getElementById('product-modal').addEventListener('click', e => {
+  if (e.target === document.getElementById('product-modal')) closeModal();
+});
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+// ── CSV IMPORT ──
+function parseCSV(text) {
+  const lines = [];
+  let cur = '', inQ = false;
+  const rows = [];
+  for (let i = 0; i < text.length; i++) {
+    const ch = text[i];
+    if (ch === '"') {
+      if (inQ && text[i+1] === '"') { cur += '"'; i++; }
+      else inQ = !inQ;
+    } else if (ch === ',' && !inQ) {
+      lines.push(cur); cur = '';
+    } else if ((ch === '\n' || ch === '\r') && !inQ) {
+      lines.push(cur); cur = '';
+      rows.push(lines.splice(0));
+      if (ch === '\r' && text[i+1] === '\n') i++;
+    } else {
+      cur += ch;
+    }
+  }
+  if (cur || lines.length) { lines.push(cur); rows.push(lines.splice(0)); }
+  return rows;
+}
+
+function csvRowsToProducts(rows) {
+  if (rows.length < 2) throw new Error('Keine Datenzeilen gefunden.');
+  const headers = rows[0].map(h => h.trim().toLowerCase());
+
+  // Column mapping (case-insensitive, flexible)
+  const col = name => {
+    const variants = {
+      'product name': ['product name','name','produktname','titel','title'],
+      'price':        ['price','preis','preis (€)'],
+      'image 1':      ['image 1','image1','foto','bild','image'],
+      'product number':['product number','product_number','artikelnummer','artikelnr','sku','slug'],
+      'kategorie':    ['kategorie','category','kategory'],
+      'designer link':['designer link','designer_link','designer','designerlink'],
+      'short description':['short description','short_description','kurzbeschreibung','beschreibung','description'],
+      'product description':['product description','product_description','beschreibung lang','long description'],
+      'featured':     ['featured','neu','new','highlight'],
+    };
+    const v = variants[name] || [name];
+    for (const alias of v) {
+      const idx = headers.indexOf(alias);
+      if (idx !== -1) return idx;
+    }
+    return -1;
+  };
+
+  const ci = {
+    name:        col('product name'),
+    preis:       col('price'),
+    foto:        col('image 1'),
+    artikelnr:   col('product number'),
+    kategorie:   col('kategorie'),
+    designer:    col('designer link'),
+    beschreibung:col('short description') !== -1 ? col('short description') : col('product description'),
+    neu:         col('featured'),
+  };
+
+  const products = [];
+  for (let i = 1; i < rows.length; i++) {
+    const r = rows[i];
+    if (r.every(c => !c.trim())) continue; // skip empty rows
+    const get = idx => (idx !== -1 && r[idx] !== undefined) ? r[idx].trim() : '';
+    const name = get(ci.name);
+    if (!name) continue;
+    products.push({
+      name,
+      preis:       get(ci.preis),
+      foto:        get(ci.foto),
+      artikelnr:   get(ci.artikelnr),
+      kategorie:   get(ci.kategorie),
+      designer:    get(ci.designer),
+      beschreibung:get(ci.beschreibung),
+      neu:         get(ci.neu).toLowerCase() === 'true',
+      erstellt:    new Date().toISOString(),
+    });
+  }
+  return products;
+}
+
+function importCSV(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const mode = document.querySelector('input[name="csv-mode"]:checked')?.value || 'append';
+  const resEl = document.getElementById('csv-result');
+  const errEl = document.getElementById('csv-error');
+  resEl.style.display = 'none'; errEl.style.display = 'none';
+
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const rows = parseCSV(e.target.result);
+      const imported = csvRowsToProducts(rows);
+      if (imported.length === 0) throw new Error('Keine gültigen Produktzeilen gefunden.');
+
+      const msg = mode === 'replace'
+        ? 'Alle bestehenden Produkte werden gelöscht und durch ' + imported.length + ' CSV-Produkte ersetzt. Fortfahren?'
+        : imported.length + ' Produkte aus CSV hinzufügen?';
+
+      if (!confirm(msg)) { input.value = ''; return; }
+
+      let prods = mode === 'replace' ? [] : getProducts();
+      prods = prods.concat(imported);
+      saveProducts(prods);
+      refreshAll();
+      markUnsaved();
+      resEl.innerHTML = '✓ <strong>' + imported.length + ' Produkte</strong> erfolgreich importiert.' +
+        '<br>Übersprungene Leerzeilen: ' + (rows.length - 1 - imported.length) +
+        ' &nbsp;·&nbsp; <a href="#" onclick="saveToFile(false);markSaved();return false;" style="color:var(--clr-accent)">Jetzt sichern (products-data.json)</a>';
+      resEl.style.display = 'block';
+      input.value = '';
+    } catch(err) {
+      errEl.textContent = '✗ Fehler: ' + err.message;
+      errEl.style.display = 'block';
+      input.value = '';
+    }
+  };
+  reader.readAsText(file, 'UTF-8');
+}
+
+function importCSVQuick(input) {
+  // Same as importCSV but always appends, no radio button needed
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const rows = parseCSV(e.target.result);
+      const imported = csvRowsToProducts(rows);
+      if (imported.length === 0) throw new Error('Keine gültigen Produktzeilen gefunden.');
+      if (!confirm(imported.length + ' Produkte aus CSV hinzufügen?')) { input.value = ''; return; }
+      const prods = getProducts().concat(imported);
+      saveProducts(prods);
+      renderProductsTable();
+      refreshDashboard();
+      markUnsaved();
+      alert('✓ ' + imported.length + ' Produkte importiert!\n\nBitte unter Einstellungen „Als products-data.json speichern" klicken.');
+      input.value = '';
+    } catch(err) {
+      alert('Fehler beim CSV-Import: ' + err.message);
+      input.value = '';
+    }
+  };
+  reader.readAsText(file, 'UTF-8');
+}
+
+// ── IMPORT / EXPORT ──
+function exportProducts() {
+  const data = localStorage.getItem(PRODUCTS_KEY) || '[]';
+  const blob = new Blob([data], {type: 'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'schmuck-produkte-' + new Date().toISOString().slice(0,10) + '.json';
+  a.click();
+}
+function importProducts(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const data = JSON.parse(e.target.result);
+      if (Array.isArray(data)) {
+        if (confirm('Bestehende Produkte ersetzen? (' + data.length + ' Produkte werden importiert)')) {
+          saveProducts(data);
+          refreshAll();
+          markUnsaved();
+          alert('Import erfolgreich!');
+        }
+      }
+    } catch(err) { alert('Ungültige Datei.'); }
+  };
+  reader.readAsText(file);
+}
+
+// ── CONNECTION CHECK ──
+function checkShopConnection() {
+  const prods = getProducts();
+  const dot   = document.getElementById('conn-dot');
+  const title = document.getElementById('conn-title');
+  const sub   = document.getElementById('conn-sub');
+  if (!dot) return;
+
+  if (prods.length === 0) {
+    dot.style.background = '#e67e22';
+    title.textContent = 'Shop verbunden – noch keine Produkte';
+    sub.textContent = 'Füge Produkte hinzu (manuell oder per CSV), sie erscheinen sofort im Shop.';
+  } else {
+    const kats = [...new Set(prods.map(p => p.kategorie).filter(Boolean))];
+    dot.style.background = '#27ae60';
+    title.textContent = '✓ Shop verbunden – ' + prods.length + ' Produkt' + (prods.length !== 1 ? 'e' : '') + ' aktiv';
+    sub.textContent = 'Kategorien: ' + kats.join(', ');
+  }
+}
+
+// ── INIT ──
+if (sessionStorage.getItem('admin_auth')) { refreshAll(); checkShopConnection(); }
+</script>
+</body>
+</html>

@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Designer – Schmuckkultur Gabriele Golzar</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400&family=Raleway:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --clr-bg: #f8f5f1;
+    --clr-text: #2a2420;
+    --clr-muted: #7a706a;
+    --clr-light: #e0d9d2;
+    --clr-accent: #8c7355;
+    --font-serif: 'Playfair Display', Georgia, serif;
+    --font-sans: 'Raleway', Helvetica, sans-serif;
+  }
+  html { scroll-behavior: smooth; }
+  body { background: var(--clr-bg); color: var(--clr-text); font-family: var(--font-sans); font-weight: 300; }
+
+  /* PAGE HERO */
+  .page-hero {
+    text-align: center;
+    padding: 72px 64px 48px;
+    border-bottom: 1px solid var(--clr-light);
+  }
+  .page-hero-label {
+    font-size: 10px;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: var(--clr-accent);
+    margin-bottom: 16px;
+    font-weight: 400;
+  }
+  .page-hero h1 {
+    font-family: var(--font-serif);
+    font-size: clamp(36px, 4vw, 58px);
+    font-weight: 400;
+    margin-bottom: 20px;
+  }
+  .page-hero p {
+    font-size: 15px;
+    line-height: 1.85;
+    color: var(--clr-muted);
+    max-width: 640px;
+    margin: 0 auto;
+  }
+  .divider {
+    width: 40px; height: 1px;
+    background: var(--clr-accent);
+    margin: 24px auto 0;
+  }
+
+  /* DESIGNER GRID */
+  .designer-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 2px;
+    padding: 2px;
+    max-width: 1400px;
+    margin: 48px auto;
+    padding: 0 48px;
+  }
+  .designer-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    padding: 40px 24px;
+    border: 1px solid var(--clr-light);
+    text-decoration: none;
+    color: var(--clr-text);
+    transition: background 0.25s, border-color 0.25s, transform 0.25s;
+    background: #fff;
+    cursor: pointer;
+    min-height: 180px;
+  }
+  .designer-card:hover {
+    background: var(--clr-bg);
+    border-color: var(--clr-accent);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+  }
+  .designer-card-logo {
+    max-width: 160px;
+    max-height: 60px;
+    object-fit: contain;
+    filter: grayscale(100%);
+    opacity: 0.7;
+    transition: filter 0.3s, opacity 0.3s;
+  }
+  .designer-card:hover .designer-card-logo {
+    filter: grayscale(0%);
+    opacity: 1;
+  }
+  .designer-card-name {
+    font-family: var(--font-serif);
+    font-size: 15px;
+    font-weight: 400;
+    font-style: italic;
+    color: var(--clr-muted);
+    text-align: center;
+    transition: color 0.2s;
+  }
+  .designer-card:hover .designer-card-name {
+    color: var(--clr-accent);
+  }
+  /* text-only card (no logo) */
+  .designer-card.text-only .designer-card-name {
+    font-size: 18px;
+    font-style: italic;
+    color: var(--clr-text);
+  }
+
+  /* CTA */
+  .cta-section {
+    text-align: center;
+    padding: 72px 48px;
+    border-top: 1px solid var(--clr-light);
+    margin-top: 48px;
+  }
+  .cta-section h2 {
+    font-family: var(--font-serif);
+    font-size: clamp(26px, 3vw, 40px);
+    font-weight: 400;
+    margin-bottom: 32px;
+  }
+  .btn {
+    display: inline-block;
+    font-family: var(--font-sans);
+    font-size: 10px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    padding: 13px 32px;
+    border: 1px solid currentColor;
+    text-decoration: none;
+    transition: background 0.25s, color 0.25s;
+    font-weight: 400;
+    color: var(--clr-accent);
+    border-color: var(--clr-accent);
+  }
+  .btn:hover { background: var(--clr-accent); color: #fff; }
+
+  /* FOOTER */
+  footer {
+    background: #1e1b18;
+    color: rgba(255,255,255,0.55);
+    padding: 64px 64px 36px;
+  }
+  .footer-top { text-align: center; margin-bottom: 48px; }
+  .footer-brand-name {
+    font-family: var(--font-serif);
+    font-size: 22px;
+    font-weight: 400;
+    color: rgba(255,255,255,0.9);
+    margin-bottom: 6px;
+  }
+  .footer-brand-sub {
+    font-size: 10px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--clr-accent);
+  }
+  .footer-divider { width: 40px; height: 1px; background: rgba(255,255,255,0.15); margin: 24px auto; }
+  .footer-grid {
+    display: grid;
+    grid-template-columns: 1.5fr 1fr 1fr 1fr;
+    gap: 40px;
+    margin-bottom: 48px;
+  }
+  .footer-col h4 {
+    font-size: 9.5px; letter-spacing: 0.22em; text-transform: uppercase;
+    color: rgba(255,255,255,0.3); margin-bottom: 18px; font-weight: 400;
+  }
+  .footer-col ul { list-style: none; }
+  .footer-col li { margin-bottom: 9px; }
+  .footer-col a { font-size: 13px; color: rgba(255,255,255,0.55); text-decoration: none; transition: color 0.2s; font-weight: 300; }
+  .footer-col a:hover { color: rgba(255,255,255,0.9); }
+  .footer-col p { font-size: 13px; line-height: 2.2; font-weight: 300; }
+  .footer-bottom {
+    border-top: 1px solid rgba(255,255,255,0.08);
+    padding-top: 24px;
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    color: rgba(255,255,255,0.25);
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .footer-bottom a { color: rgba(255,255,255,0.3); text-decoration: none; }
+  .footer-bottom a:hover { color: rgba(255,255,255,0.6); }
+
+  @media (max-width: 1100px) { .designer-grid { grid-template-columns: repeat(3,1fr); } }
+  @media (max-width: 750px) { .designer-grid { grid-template-columns: repeat(2,1fr); padding: 0 16px; } }
+  @media (max-width: 480px) { .designer-grid { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+
+<script src="nav.js?v=7"></script>
+<site-nav active="designer"></site-nav>
+
+<div class="page-hero">
+  <p class="page-hero-label">Unsere Partner</p>
+  <h1>Designer</h1>
+  <p>Wir sind seit vielen Jahren ein fester Bestandteil der Mödlinger Hauptstraße. Unser Haus steht für Schmuck, der nicht beliebig ist, sondern bewusst ausgewählt wird. Wir präsentieren einen Streifzug durch die vielgestaltige Schmuckkultur, die Ihre Persönlichkeit auf besondere Weise widerspiegelt.</p>
+  <div class="divider"></div>
+</div>
+
+<div class="designer-grid">
+
+  <a class="designer-card" href="#">
+    <img class="designer-card-logo" src="images/logo.jpg" alt="Gabriele Golzar">
+    <span class="designer-card-name">Gabriele Golzar</span>
+  </a>
+
+  <a class="designer-card" href="https://www.qlocktwo.com/" target="_blank" rel="noopener">
+    <img class="designer-card-logo" src="images/designer-logos/qlocktwo.jpg" alt="Qlocktwo">
+    <span class="designer-card-name">Qlocktwo</span>
+  </a>
+
+  <a class="designer-card" href="https://utedippel.de/" target="_blank" rel="noopener">
+    <img class="designer-card-logo" src="images/designer-logos/ute-dippl.png" alt="Ute Dippl">
+    <span class="designer-card-name">Ute Dippl</span>
+  </a>
+
+  <a class="designer-card" href="https://www.andreafrahm.de/" target="_blank" rel="noopener">
+    <img class="designer-card-logo" src="images/designer-logos/andrea-frahm.webp" alt="Andrea Frahm">
+    <span class="designer-card-name">Andrea Frahm</span>
+  </a>
+
+  <a class="designer-card" href="https://www.gellner.com/" target="_blank" rel="noopener">
+    <img class="designer-card-logo" src="images/designer-logos/gellner.png" alt="Gellner">
+    <span class="designer-card-name">Gellner</span>
+  </a>
+
+  <a class="designer-card" href="https://www.henrich-denzel.com/" target="_blank" rel="noopener">
+    <img class="designer-card-logo" src="images/designer-logos/henrich-denzel.svg" alt="Henrich &amp; Denzel">
+    <span class="designer-card-name">Henrich &amp; Denzel</span>
+  </a>
+
+  <a class="designer-card" href="https://www.angelahuebel.de/" target="_blank" rel="noopener">
+    <img class="designer-card-logo" src="images/designer-logos/angela-huebel.png" alt="Angela Hübel">
+    <span class="designer-card-name">Angela Hübel</span>
+  </a>
+
+  <a class="designer-card" href="http://www.claudia-hoppe.de/" target="_blank" rel="noopener">
+    <img class="designer-card-logo" src="images/designer-logos/claudia-hoppe.svg" alt="Claudia Hoppe">
+    <span class="designer-card-name">Claudia Hoppe</span>
+  </a>
+
+  <a class="designer-card" href="https://joergheinz.de/" target="_blank" rel="noopener">
+    <img class="designer-card-logo" src="images/designer-logos/joerg-heinz.png" alt="Jörg Heinz">
+    <span class="designer-card-name">Jörg Heinz</span>
+  </a>
+
+  <a class="designer-card" href="https://jirokamata.com/" target="_blank" rel="noopener">
+    <img class="designer-card-logo" src="images/designer-logos/jiro-kamata.jpg" alt="Jiro Kamata">
+    <span class="designer-card-name">Jiro Kamata</span>
+  </a>
+
+  <a class="designer-card" href="https://patrickmalotki.de/" target="_blank" rel="noopener">
+    <img class="designer-card-logo" src="images/designer-logos/patrick-malotky.png" alt="Patrick Malotky">
+    <span class="designer-card-name">Patrick Malotky</span>
+  </a>
+
+  <a class="designer-card" href="https://www.manuschmuck.de/" target="_blank" rel="noopener">
+    <img class="designer-card-logo" src="images/designer-logos/manu.png" alt="MANU">
+    <span class="designer-card-name">MANU</span>
+  </a>
+
+  <a class="designer-card" href="https://www.maierundbeck.de/" target="_blank" rel="noopener">
+    <img class="designer-card-logo" src="images/designer-logos/maier-beck.jpg" alt="Maier &amp; Beck">
+    <span class="designer-card-name">Maier &amp; Beck</span>
+  </a>
+
+  <a class="designer-card" href="https://niessing.com/de-AT/SCHMUCK/" target="_blank" rel="noopener">
+    <img class="designer-card-logo" src="images/designer-logos/niessing.png" alt="Niessing">
+    <span class="designer-card-name">NIESSING</span>
+  </a>
+
+  <a class="designer-card" href="https://kaz-ni.de/" target="_blank" rel="noopener">
+    <img class="designer-card-logo" src="images/designer-logos/kazuko.png" alt="Kazuko Nishibayashi">
+    <span class="designer-card-name">Kazuko Nishibayashi</span>
+  </a>
+
+  <a class="designer-card text-only" href="#">
+    <span class="designer-card-name">Perlen Perlenketten</span>
+  </a>
+
+  <a class="designer-card" href="https://www.quinn.de/" target="_blank" rel="noopener">
+    <img class="designer-card-logo" src="images/designer-logos/quinn.png" alt="Quinn">
+    <span class="designer-card-name">Quinn</span>
+  </a>
+
+  <a class="designer-card" href="https://www.franziska-rappold.de/" target="_blank" rel="noopener">
+    <img class="designer-card-logo" src="images/designer-logos/franziska-rappold.png" alt="Franziska Rappold">
+    <span class="designer-card-name">Franziska Rappold</span>
+  </a>
+
+  <a class="designer-card" href="https://www.monika-seitter.de/" target="_blank" rel="noopener">
+    <img class="designer-card-logo" src="images/designer-logos/monika-seitter.svg" alt="Monika Seitter">
+    <span class="designer-card-name">Monika Seitter</span>
+  </a>
+
+  <a class="designer-card" href="https://violettaelisaseliger.de/" target="_blank" rel="noopener">
+    <img class="designer-card-logo" src="images/designer-logos/violetta-seliger.png" alt="Violetta Seliger">
+    <span class="designer-card-name">Violetta Seliger</span>
+  </a>
+
+  <a class="designer-card" href="https://ol-schmidt.de/" target="_blank" rel="noopener">
+    <img class="designer-card-logo" src="images/designer-logos/oliver-schmidt.svg" alt="Oliver Schmidt">
+    <span class="designer-card-name">Oliver Schmidt</span>
+  </a>
+
+  <a class="designer-card" href="https://www.barbara-jewellery.com/portfolio/sternenstaub/" target="_blank" rel="noopener">
+    <img class="designer-card-logo" src="images/designer-logos/barbara-jewellery.png" alt="Barbara Jewellery">
+    <span class="designer-card-name">Barbara Jewellery</span>
+  </a>
+
+  <a class="designer-card" href="https://evastrepp.de/de/armschmuck/" target="_blank" rel="noopener">
+    <img class="designer-card-logo" src="images/designer-logos/eva-strepp.png" alt="Eva Strepp">
+    <span class="designer-card-name">Eva Strepp</span>
+  </a>
+
+  <a class="designer-card" href="https://www.yokotakirai.com/en/jewellery-next-level-isabella-hund-gallery-in-munich/" target="_blank" rel="noopener">
+    <img class="designer-card-logo" src="images/designer-logos/joko-takirai.jpg" alt="Joko Takirai">
+    <span class="designer-card-name">Joko Takirai</span>
+  </a>
+
+  <a class="designer-card" href="http://www.takto.es/" target="_blank" rel="noopener">
+    <img class="designer-card-logo" src="images/designer-logos/takto.png" alt="Takto">
+    <span class="designer-card-name">Takto</span>
+  </a>
+
+  <a class="designer-card" href="https://www.tezer-design.de/" target="_blank" rel="noopener">
+    <img class="designer-card-logo" src="images/designer-logos/tezer.png" alt="TEZER">
+    <span class="designer-card-name">TEZER</span>
+  </a>
+
+  <a class="designer-card" href="https://www.un-wearable-design.com/necklaces" target="_blank" rel="noopener">
+    <img class="designer-card-logo" src="images/designer-logos/guzin.png" alt="Güzin">
+    <span class="designer-card-name">Güzin</span>
+  </a>
+
+  <a class="designer-card" href="https://tanjazessel.de/" target="_blank" rel="noopener">
+    <img class="designer-card-logo" src="images/designer-logos/tanja-zessel.png" alt="Tanja Zessel">
+    <span class="designer-card-name">Tanja Zessel</span>
+  </a>
+
+  <a class="designer-card" href="https://www.ilkabruse.de/" target="_blank" rel="noopener">
+    <img class="designer-card-logo" src="images/designer-logos/ilka-bruse.png" alt="Ilka Bruse">
+    <span class="designer-card-name">Ilka Bruse</span>
+  </a>
+
+  <a class="designer-card" href="http://www.dorothea-brill.de/" target="_blank" rel="noopener">
+    <img class="designer-card-logo" src="images/designer-logos/dorothea-brill.png" alt="Dorothea Brill">
+    <span class="designer-card-name">Dorothea Brill</span>
+  </a>
+
+  <a class="designer-card text-only" href="https://dau-berlin.com/" target="_blank" rel="noopener">
+    <span class="designer-card-name">Carl Dau</span>
+  </a>
+
+</div>
+
+<div class="cta-section">
+  <h2>Wir freuen uns auf Sie!</h2>
+  <a href="kontakt.html" class="btn">Jetzt kontaktieren</a>
+</div>
+
+<script src="footer.js?v=1"></script>
+<site-footer></site-footer>
+
+</body>
+</html>

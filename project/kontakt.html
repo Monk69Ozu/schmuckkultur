@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kontakt – Schmuckkultur Gabriele Golzar</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400&family=Raleway:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --clr-bg: #f8f5f1;
+    --clr-text: #2a2420;
+    --clr-muted: #7a706a;
+    --clr-light: #e0d9d2;
+    --clr-border: #ddd6ce;
+    --clr-accent: #8c7355;
+    --font-serif: 'Playfair Display', Georgia, serif;
+    --font-sans: 'Raleway', Helvetica, sans-serif;
+  }
+  html { scroll-behavior: smooth; }
+  body { background: var(--clr-bg); color: var(--clr-text); font-family: var(--font-sans); font-weight: 300; }
+
+  /* PAGE HERO */
+  .page-hero {
+    position: relative;
+    height: 42vh;
+    min-height: 300px;
+    overflow: hidden;
+  }
+  .page-hero-img {
+    position: absolute; inset: 0;
+    width: 100%; height: 100%;
+    object-fit: cover;
+    object-position: center 40%;
+  }
+  .page-hero-overlay {
+    position: absolute; inset: 0;
+    background: linear-gradient(to bottom, rgba(20,16,12,0.3) 0%, rgba(20,16,12,0.65) 100%);
+  }
+  .page-hero-content {
+    position: absolute; inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    gap: 12px;
+  }
+  .page-hero-label {
+    font-size: 9px;
+    letter-spacing: 0.36em;
+    text-transform: uppercase;
+    opacity: 0.6;
+    font-family: var(--font-sans);
+  }
+  .page-hero-content h1 {
+    font-family: var(--font-serif);
+    font-size: clamp(36px, 5vw, 64px);
+    font-weight: 400;
+    line-height: 1.1;
+  }
+  .page-hero-divider {
+    width: 40px; height: 1px;
+    background: rgba(255,255,255,0.4);
+  }
+
+  /* MAIN GRID */
+  .contact-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    min-height: 560px;
+  }
+
+  /* LEFT: MAP + INFO */
+  .contact-left {
+    display: flex;
+    flex-direction: column;
+    border-right: 1px solid var(--clr-border);
+  }
+  .contact-map {
+    flex: 1;
+    min-height: 320px;
+    background: #e0dbd4;
+    position: relative;
+    overflow: hidden;
+  }
+  .contact-map iframe {
+    width: 100%; height: 100%;
+    border: none;
+    display: block;
+    filter: grayscale(25%) contrast(1.05);
+  }
+  .contact-info {
+    padding: 48px 56px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px 32px;
+    border-top: 1px solid var(--clr-border);
+  }
+  .contact-info-block h3 {
+    font-size: 9px;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: var(--clr-accent);
+    margin-bottom: 14px;
+    font-weight: 400;
+    font-family: var(--font-sans);
+  }
+  .contact-info-block p,
+  .contact-info-block a {
+    font-size: 14px;
+    line-height: 2;
+    color: var(--clr-muted);
+    text-decoration: none;
+    display: block;
+    font-weight: 300;
+    transition: color 0.2s;
+  }
+  .contact-info-block a:hover { color: var(--clr-accent); }
+  .contact-info-block .hours-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 13px;
+    line-height: 2;
+    color: var(--clr-muted);
+    max-width: 200px;
+  }
+  .contact-info-block .hours-row span:last-child {
+    color: var(--clr-text);
+    font-weight: 400;
+  }
+
+  /* RIGHT: FORM */
+  .contact-right {
+    padding: 64px 56px;
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+  }
+  .contact-form-label {
+    font-size: 9px;
+    letter-spacing: 0.32em;
+    text-transform: uppercase;
+    color: var(--clr-accent);
+    font-weight: 400;
+  }
+  .contact-form-title {
+    font-family: var(--font-serif);
+    font-size: clamp(26px, 2.5vw, 38px);
+    font-weight: 400;
+    line-height: 1.2;
+    margin-top: -12px;
+  }
+  .contact-form-desc {
+    font-size: 14px;
+    line-height: 1.85;
+    color: var(--clr-muted);
+    max-width: 440px;
+    margin-top: -16px;
+  }
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+  label {
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--clr-muted);
+    font-weight: 400;
+  }
+  input, textarea, select {
+    font-family: var(--font-sans);
+    font-size: 13px;
+    font-weight: 300;
+    color: var(--clr-text);
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid var(--clr-border);
+    padding: 10px 0;
+    outline: none;
+    transition: border-color 0.2s;
+    width: 100%;
+    -webkit-appearance: none;
+  }
+  input:focus, textarea:focus, select:focus { border-color: var(--clr-accent); }
+  input::placeholder, textarea::placeholder { color: var(--clr-light); }
+  textarea { resize: none; height: 90px; }
+  .form-submit {
+    display: inline-block;
+    font-family: var(--font-sans);
+    font-size: 10px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    padding: 14px 36px;
+    background: var(--clr-text);
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    transition: background 0.25s;
+    align-self: flex-start;
+    font-weight: 400;
+  }
+  .form-submit:hover { background: var(--clr-accent); }
+  .form-success {
+    display: none;
+    padding: 16px 20px;
+    background: rgba(140,115,85,0.08);
+    border-left: 3px solid var(--clr-accent);
+    font-size: 13px;
+    color: var(--clr-muted);
+    line-height: 1.7;
+  }
+
+  /* SOCIAL STRIP */
+  .social-strip {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 48px;
+    padding: 48px 64px;
+    border-top: 1px solid var(--clr-border);
+    border-bottom: 1px solid var(--clr-border);
+  }
+  .social-strip-label {
+    font-size: 9px;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: var(--clr-muted);
+    font-weight: 400;
+  }
+  .social-link {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+    color: var(--clr-text);
+    font-size: 13px;
+    font-family: var(--font-serif);
+    font-style: italic;
+    transition: color 0.2s;
+  }
+  .social-link:hover { color: var(--clr-accent); }
+  .social-link svg { flex-shrink: 0; }
+
+  /* FOOTER */
+  footer {
+    background: #1e1b18;
+    color: rgba(255,255,255,0.55);
+    padding: 56px 64px 36px;
+  }
+  .footer-inner {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr;
+    gap: 40px;
+    margin-bottom: 40px;
+  }
+  .footer-logo {
+    font-family: var(--font-serif);
+    font-size: 18px;
+    color: rgba(255,255,255,0.85);
+    font-weight: 400;
+    margin-bottom: 16px;
+  }
+  .footer-col h4 {
+    font-size: 9px; letter-spacing: 0.22em; text-transform: uppercase;
+    color: rgba(255,255,255,0.3); margin-bottom: 16px; font-weight: 400;
+  }
+  .footer-col ul { list-style: none; }
+  .footer-col li { margin-bottom: 8px; }
+  .footer-col a { font-size: 12px; color: rgba(255,255,255,0.5); text-decoration: none; transition: color 0.2s; }
+  .footer-col a:hover { color: rgba(255,255,255,0.9); }
+  .footer-col p { font-size: 12px; line-height: 2.2; }
+  .footer-bottom {
+    border-top: 1px solid rgba(255,255,255,0.08);
+    padding-top: 20px;
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    color: rgba(255,255,255,0.25);
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .footer-bottom a { color: rgba(255,255,255,0.3); text-decoration: none; }
+  .footer-bottom a:hover { color: rgba(255,255,255,0.6); }
+
+  @media (max-width: 900px) {
+    .contact-grid { grid-template-columns: 1fr; }
+    .contact-left { border-right: none; border-bottom: 1px solid var(--clr-border); }
+    .contact-right { padding: 48px 24px; }
+    .contact-info { padding: 32px 24px; grid-template-columns: 1fr; gap: 28px; }
+    .form-row { grid-template-columns: 1fr; }
+    .footer-inner { grid-template-columns: 1fr 1fr; }
+    .social-strip { flex-direction: column; gap: 24px; padding: 36px 24px; }
+  }
+</style>
+</head>
+<body>
+
+<script src="nav.js?v=7"></script>
+<site-nav active="kontakt"></site-nav>
+
+<!-- PAGE HERO -->
+<div class="page-hero">
+  <img class="page-hero-img" src="images/atelier.jpg" alt="Kontakt">
+  <div class="page-hero-overlay"></div>
+  <div class="page-hero-content">
+    <p class="page-hero-label">Wir freuen uns auf Sie</p>
+    <h1>Kontakt</h1>
+    <div class="page-hero-divider"></div>
+  </div>
+</div>
+
+<!-- MAIN GRID -->
+<div class="contact-grid">
+
+  <!-- LEFT: MAP + INFO -->
+  <div class="contact-left">
+    <div class="contact-info">
+      <div class="contact-info-block">
+        <h3>Adresse</h3>
+        <a href="https://maps.google.com/?q=Hauptstra%C3%9Fe+71+M%C3%B6dling" target="_blank">
+          Hauptstraße 71<br>
+          2340 Mödling<br>
+          Österreich
+        </a>
+      </div>
+      <div class="contact-info-block">
+        <h3>Kontakt</h3>
+        <a href="tel:+43223622790">+43 (2236) 2 27 90</a>
+        <a href="mailto:info@schmuckkultur.at">info@schmuckkultur.at</a>
+        <a href="https://www.schmuckkultur.at" target="_blank">www.schmuckkultur.at</a>
+      </div>
+      <div class="contact-info-block">
+        <h3>Öffnungszeiten</h3>
+        <div class="hours-row"><span>Mo – Fr</span><span>9:00 – 18:00</span></div>
+        <div class="hours-row"><span>Samstag</span><span>9:00 – 13:00</span></div>
+        <div class="hours-row"><span>Sonntag</span><span>geschlossen</span></div>
+      </div>
+      <div class="contact-info-block">
+        <h3>Folge uns</h3>
+        <a href="https://www.facebook.com/schmuckkulturweiss" target="_blank">Facebook</a>
+        <a href="https://www.instagram.com/schmuckkultur.weiss/" target="_blank">Instagram</a>
+      </div>
+    </div>
+    <!-- GOOGLE MAPS -->
+    <div style="flex:1;min-height:300px;">
+      <iframe
+        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2664.89!2d16.2821!3d48.0856!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x476da9b49fd6a255%3A0x5f6d6f65c5f2e1a0!2sHauptstra%C3%9Fe%2071%2C%202340%20M%C3%B6dling!5e0!3m2!1sde!2sat!4v1713800000000!5m2!1sde!2sat"
+        style="width:100%;height:100%;border:none;display:block;filter:grayscale(20%) contrast(1.05);"
+        allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade">
+      </iframe>
+    </div>
+  </div>
+
+  <!-- RIGHT: FORM -->
+  <div class="contact-right">
+    <p class="contact-form-label">Schreiben Sie uns</p>
+    <h2 class="contact-form-title">Wir antworten<br>so schnell wie möglich</h2>
+    <p class="contact-form-desc">Haben Sie Fragen zu einem Schmuckstück, einem Designer oder möchten Sie einen Termin vereinbaren? Wir freuen uns über Ihre Nachricht.</p>
+
+    <form id="contact-form" onsubmit="submitForm(event)">
+      <input type="hidden" name="_to" value="info@schmuckkultur.at">
+      <div class="form-row">
+        <div class="form-group">
+          <label for="fname">Vorname</label>
+          <input type="text" id="fname" name="fname" placeholder="Maria" required>
+        </div>
+        <div class="form-group">
+          <label for="lname">Nachname</label>
+          <input type="text" id="lname" name="lname" placeholder="Muster" required>
+        </div>
+      </div>
+      <div class="form-group" style="margin-top:20px">
+        <label for="email">E-Mail</label>
+        <input type="email" id="email" name="email" placeholder="maria@beispiel.at" required>
+      </div>
+      <div class="form-group" style="margin-top:20px">
+        <label for="phone">Telefon (optional)</label>
+        <input type="tel" id="phone" name="phone" placeholder="+43 …">
+      </div>
+      <div class="form-group" style="margin-top:20px">
+        <label for="subject">Betreff</label>
+        <select id="subject" name="subject">
+          <option value="">Bitte wählen …</option>
+          <option>Allgemeine Anfrage</option>
+          <option>Schmuck / Produkte</option>
+          <option>Trauringe / Verlobungsringe</option>
+          <option>Atelierschmuck</option>
+          <option>Cliq-Ringe</option>
+          <option>Terminvereinbarung</option>
+          <option>Sonstiges</option>
+        </select>
+      </div>
+      <div class="form-group" style="margin-top:20px">
+        <label for="message">Nachricht</label>
+        <textarea id="message" name="message" placeholder="Ihre Nachricht …" required></textarea>
+      </div>
+      <div style="margin-top:32px; display:flex; flex-direction:column; gap:16px">
+        <button type="submit" class="form-submit">Nachricht senden</button>
+        <div class="form-success" id="form-success">
+          Vielen Dank für Ihre Nachricht! Wir melden uns so schnell wie möglich bei Ihnen.
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- SOCIAL STRIP -->
+<div class="social-strip">
+  <span class="social-strip-label">Folgen Sie uns</span>
+  <a class="social-link" href="https://www.facebook.com/schmuckkulturweiss" target="_blank">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M22 12c0-5.52-4.48-10-10-10S2 6.48 2 12c0 4.84 3.44 8.87 8 9.8V15H8v-3h2V9.5C10 7.57 11.57 6 13.5 6H16v3h-2c-.55 0-1 .45-1 1v2h3v3h-3v6.95c5.05-.5 9-4.76 9-9.95z"/></svg>
+    Schmuckkultur Weiss
+  </a>
+  <span style="width:1px;height:24px;background:var(--clr-light)"></span>
+  <a class="social-link" href="https://www.instagram.com/schmuckkultur.weiss/" target="_blank">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
+    @schmuckkultur.weiss
+  </a>
+</div>
+
+<!-- FOOTER -->
+<script src="footer.js?v=1"></script>
+<site-footer></site-footer>
+
+<script>
+  function submitForm(e) {
+    e.preventDefault();
+    const btn = e.target.querySelector('.form-submit');
+    btn.textContent = 'Wird gesendet …';
+    btn.disabled = true;
+
+    // Build mailto link with form data
+    const fname   = document.getElementById('fname').value;
+    const lname   = document.getElementById('lname').value;
+    const email   = document.getElementById('email').value;
+    const phone   = document.getElementById('phone').value;
+    const subject = document.getElementById('subject').value;
+    const message = document.getElementById('message').value;
+
+    const body = [
+      'Von: ' + fname + ' ' + lname,
+      'E-Mail: ' + email,
+      phone ? 'Telefon: ' + phone : '',
+      '',
+      message
+    ].filter(Boolean).join('\n');
+
+    const mailtoLink = 'mailto:info@schmuckkultur.at'
+      + '?subject=' + encodeURIComponent('Anfrage: ' + (subject || 'Allgemein'))
+      + '&body=' + encodeURIComponent(body);
+
+    window.location.href = mailtoLink;
+
+    setTimeout(() => {
+      document.getElementById('contact-form').style.display = 'none';
+      document.getElementById('form-success').style.display = 'block';
+    }, 900);
+  }
+</script>
+</body>
+</html>

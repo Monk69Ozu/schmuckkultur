@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Schmuckkultur Gabriele Golzar – Designschmuck Perlen Juwelier</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Raleway:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --clr-bg:     #f7f4f0;
+    --clr-text:   #252018;
+    --clr-muted:  #7a7168;
+    --clr-border: #ddd8d0;
+    --clr-accent: #8c7355;
+    --font-serif: 'Cormorant Garamond', Georgia, serif;
+    --font-sans:  'Raleway', Helvetica, sans-serif;
+  }
+
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--clr-bg);
+    color: var(--clr-text);
+    font-family: var(--font-sans);
+    font-weight: 300;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ── COOKIE BAR ── */
+  .cookie-bar {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    z-index: 998;
+    background: var(--clr-text);
+    color: rgba(255,255,255,0.7);
+    font-size: 12px;
+    padding: 10px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    font-family: var(--font-sans);
+    font-weight: 300;
+    letter-spacing: 0.01em;
+  }
+  .cookie-bar a { color: rgba(255,255,255,0.55); text-decoration: underline; }
+  .cookie-bar button {
+    background: none;
+    border: 1px solid rgba(255,255,255,0.35);
+    color: rgba(255,255,255,0.8);
+    font-family: var(--font-sans);
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    padding: 5px 14px;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: background 0.2s;
+  }
+  .cookie-bar button:hover { background: rgba(255,255,255,0.1); }
+
+
+
+  /* ── NAV ── */
+  nav {
+    display: flex;
+    justify-content: center;
+    gap: 0;
+    list-style: none;
+    flex-wrap: wrap;
+  }
+  nav li a {
+    display: block;
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--clr-muted);
+    text-decoration: none;
+    padding: 12px 20px;
+    font-weight: 400;
+    transition: color 0.2s;
+    position: relative;
+  }
+  nav li a::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 50%; right: 50%;
+    height: 2px;
+    background: var(--clr-accent);
+    transition: left 0.25s, right 0.25s;
+  }
+  nav li a:hover { color: var(--clr-text); }
+  nav li a:hover::after { left: 12px; right: 12px; }
+
+  /* ── MEGA MENU ── */
+  .mega-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+    background: rgba(30,24,18,0.45);
+    backdrop-filter: blur(2px);
+  }
+  .mega-overlay.open { display: block; }
+  .mega-panel {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    background: var(--clr-bg);
+    padding: 56px 64px 64px;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.12);
+    transform: translateY(-100%);
+    transition: transform 0.35s cubic-bezier(0.4,0,0.2,1);
+  }
+  .mega-overlay.open .mega-panel { transform: translateY(0); }
+  .mega-close {
+    position: absolute;
+    top: 20px; right: 28px;
+    font-size: 24px;
+    cursor: pointer;
+    color: var(--clr-muted);
+    background: none;
+    border: none;
+    line-height: 1;
+    transition: color 0.2s;
+  }
+  .mega-close:hover { color: var(--clr-text); }
+  .mega-title {
+    font-size: 10px;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: var(--clr-accent);
+    margin-bottom: 40px;
+    font-family: var(--font-sans);
+  }
+  .mega-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 32px 24px;
+  }
+  .mega-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+    text-decoration: none;
+    cursor: pointer;
+  }
+  .mega-item-img {
+    width: 100%;
+    aspect-ratio: 1;
+    overflow: hidden;
+    background: #e8e3dd;
+  }
+  .mega-item-img img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    transition: transform 0.4s ease;
+    filter: grayscale(15%);
+  }
+  .mega-item:hover .mega-item-img img {
+    transform: scale(1.05);
+    filter: grayscale(0%);
+  }
+  .mega-item-label {
+    font-size: 10px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--clr-muted);
+    font-family: var(--font-sans);
+    font-weight: 400;
+    transition: color 0.2s;
+  }
+  .mega-item:hover .mega-item-label { color: var(--clr-accent); }
+
+  /* ── SLIDESHOW ── */
+  .slideshow {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+    background: #1c1915;
+    flex-shrink: 0;
+  }
+  .slideshow-inner {
+    display: flex;
+    transition: transform 0.9s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .slide {
+    min-width: 100%;
+    height: 70vh;
+    min-height: 400px;
+    max-height: 720px;
+    flex-shrink: 0;
+    overflow: hidden;
+    position: relative;
+  }
+  .slide img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    display: block;
+  }
+  /* prev / next arrows */
+  .ss-arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 10;
+    background: rgba(255,255,255,0.15);
+    border: none;
+    color: #fff;
+    width: 44px; height: 44px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    font-size: 20px;
+    backdrop-filter: blur(4px);
+    transition: background 0.2s;
+  }
+  .ss-arrow:hover { background: rgba(255,255,255,0.3); }
+  .ss-prev { left: 20px; }
+  .ss-next { right: 20px; }
+  .ss-dots {
+    position: absolute;
+    bottom: 18px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 8px;
+    z-index: 10;
+  }
+  .ss-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.4);
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    transition: background 0.3s, transform 0.2s;
+  }
+  .ss-dot.active { background: #fff; transform: scale(1.3); }
+
+  /* ── MAIN CONTENT ── */
+  main {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 60px 32px;
+    flex: 1;
+    width: 100%;
+  }
+
+  /* SPECIAL NOTE (Cliq) */
+  .special-note {
+    display: flex;
+    gap: 36px;
+    align-items: flex-start;
+    margin-bottom: 56px;
+    padding-bottom: 56px;
+    border-bottom: 1px solid var(--clr-border);
+  }
+  .special-note img {
+    width: 260px;
+    height: 180px;
+    object-fit: cover;
+    flex-shrink: 0;
+  }
+  .special-note-ph {
+    width: 260px;
+    height: 180px;
+    flex-shrink: 0;
+    background: repeating-linear-gradient(135deg, #ddd6ce 0px, #ddd6ce 8px, #cfc8bf 8px, #cfc8bf 16px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: monospace;
+    font-size: 11px;
+    color: rgba(0,0,0,0.3);
+    text-align: center;
+    padding: 12px;
+  }
+  .special-note-text h3 {
+    font-family: var(--font-serif);
+    font-size: 22px;
+    font-weight: 400;
+    margin-bottom: 12px;
+    font-style: italic;
+  }
+  .special-note-text p {
+    font-size: 14px;
+    line-height: 1.85;
+    color: var(--clr-muted);
+    margin-bottom: 16px;
+  }
+  .special-note-text a {
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--clr-accent);
+    text-decoration: none;
+    border-bottom: 1px solid var(--clr-accent);
+    padding-bottom: 2px;
+    transition: opacity 0.2s;
+  }
+  .special-note-text a:hover { opacity: 0.7; }
+
+  /* ── HERO + SOCIAL ── */
+  .hero-social {
+    position: relative;
+    height: 88vh;
+    min-height: 560px;
+    overflow: hidden;
+  }
+  .hero-bg {
+    position: absolute; inset: 0;
+    width: 100%; height: 100%;
+    object-fit: cover;
+    object-position: center 30%;
+    transition: transform 8s ease;
+  }
+  .hero-social:hover .hero-bg { transform: scale(1.03); }
+  .hero-gradient {
+    position: absolute; inset: 0;
+    background: linear-gradient(
+      to bottom,
+      rgba(20,16,12,0.15) 0%,
+      rgba(20,16,12,0.0) 40%,
+      rgba(20,16,12,0.55) 80%,
+      rgba(20,16,12,0.80) 100%
+    );
+  }
+  /* text content bottom-left */
+  .hero-content {
+    position: absolute;
+    bottom: 52px; left: 64px;
+    z-index: 2;
+    color: #fff;
+    max-width: 560px;
+  }
+  .hero-content-label {
+    font-size: 9px;
+    letter-spacing: 0.36em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.55);
+    margin-bottom: 14px;
+    font-family: var(--font-sans);
+  }
+  .hero-content h2 {
+    font-family: var(--font-serif);
+    font-size: clamp(32px, 3.8vw, 56px);
+    font-weight: 400;
+    line-height: 1.1;
+    margin-bottom: 28px;
+    color: #fff;
+    text-shadow: 0 2px 24px rgba(0,0,0,0.25);
+  }
+  .hero-content-btn {
+    display: inline-block;
+    font-family: var(--font-sans);
+    font-size: 9px;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: #fff;
+    border: 1px solid rgba(255,255,255,0.6);
+    padding: 12px 28px;
+    text-decoration: none;
+    transition: background 0.25s, border-color 0.25s;
+  }
+  .hero-content-btn:hover { background: rgba(255,255,255,0.15); border-color: #fff; }
+  /* social pills bottom-right */
+  .hero-social-pills {
+    position: absolute;
+    bottom: 52px; right: 64px;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    align-items: flex-end;
+  }
+  .social-pill {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 24px 14px 18px;
+    background: rgba(255,255,255,0.13);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255,255,255,0.28);
+    color: #fff;
+    text-decoration: none;
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    font-family: var(--font-sans);
+    transition: background 0.25s, border-color 0.25s, transform 0.2s;
+    cursor: pointer;
+    min-width: 240px;
+  }
+  .social-pill:hover {
+    background: rgba(255,255,255,0.26);
+    border-color: rgba(255,255,255,0.6);
+    transform: translateX(-6px);
+  }
+  .social-pill svg { flex-shrink: 0; width: 22px; height: 22px; }
+  .social-pill-name { font-style: italic; font-family: var(--font-serif); font-size: 17px; letter-spacing: 0.01em; text-transform: none; opacity: 0.9; }
+  /* scroll hint */
+  .hero-scroll {
+    position: absolute;
+    bottom: 28px; left: 50%; transform: translateX(-50%);
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    color: rgba(255,255,255,0.4);
+    font-size: 8px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    font-family: var(--font-sans);
+  }
+  .hero-scroll-line {
+    width: 1px;
+    height: 36px;
+    background: rgba(255,255,255,0.3);
+    animation: scrollpulse 2s ease-in-out infinite;
+  }
+  @keyframes scrollpulse {
+    0%,100% { opacity: 0.3; transform: scaleY(1); }
+    50% { opacity: 0.9; transform: scaleY(0.6); }
+  }
+  @media (max-width: 860px) {
+    .hero-social { height: 70vh; min-height: 440px; }
+    .hero-content { left: 24px; bottom: 36px; }
+    .hero-social-pills { right: 24px; bottom: 36px; }
+  }
+
+  /* ADDRESS + INTRO */
+  .intro-block {
+    display: grid;
+    grid-template-columns: 1fr 1.6fr;
+    gap: 48px;
+    margin-bottom: 56px;
+    padding-bottom: 56px;
+    border-bottom: 1px solid var(--clr-border);
+    align-items: start;
+  }
+  .address {
+    font-size: 13px;
+    line-height: 2;
+    color: var(--clr-muted);
+  }
+  .address strong {
+    display: block;
+    font-size: 12px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--clr-text);
+    font-weight: 500;
+    margin-bottom: 8px;
+  }
+  .address a { color: var(--clr-accent); text-decoration: none; }
+  .address a:hover { text-decoration: underline; }
+  .intro-text h2 {
+    font-family: var(--font-serif);
+    font-size: 28px;
+    font-weight: 400;
+    font-style: italic;
+    margin-bottom: 16px;
+    line-height: 1.2;
+  }
+  .intro-text p {
+    font-size: 14px;
+    line-height: 1.9;
+    color: var(--clr-muted);
+    text-wrap: pretty;
+  }
+
+  /* DESIGNER LIST */
+  .designer-block {
+    margin-bottom: 56px;
+  }
+  .designer-block h2 {
+    font-family: var(--font-serif);
+    font-size: 26px;
+    font-weight: 400;
+    margin-bottom: 24px;
+  }
+  .designer-list {
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .designer-list li a {
+    font-family: var(--font-serif);
+    font-size: 16px;
+    font-style: italic;
+    color: var(--clr-muted);
+    text-decoration: none;
+    padding: 8px 18px;
+    border: 1px solid var(--clr-border);
+    display: inline-block;
+    transition: color 0.2s, border-color 0.2s;
+  }
+  .designer-list li a:hover {
+    color: var(--clr-accent);
+    border-color: var(--clr-accent);
+  }
+  .designer-list li.more a {
+    font-style: normal;
+    font-family: var(--font-sans);
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    color: var(--clr-accent);
+    border-style: dashed;
+  }
+
+  /* SOCIAL */
+  .social-block {
+    margin-bottom: 16px;
+  }
+  .social-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 12px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--clr-muted);
+    text-decoration: none;
+    transition: color 0.2s;
+    border: 1px solid var(--clr-border);
+    padding: 10px 20px;
+  }
+  .social-link:hover { color: #1877f2; border-color: #1877f2; }
+  .social-link svg { width: 16px; height: 16px; fill: currentColor; }
+
+  /* ── FOOTER ── */
+  footer {
+    background: var(--clr-text);
+    color: rgba(255,255,255,0.45);
+    padding: 36px 32px;
+    text-align: center;
+  }
+  .footer-inner {
+    max-width: 900px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+  }
+  .footer-logo {
+    font-family: var(--font-serif);
+    font-size: 18px;
+    font-weight: 400;
+    color: rgba(255,255,255,0.75);
+    letter-spacing: 0.04em;
+  }
+  .footer-links {
+    display: flex;
+    gap: 24px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .footer-links a {
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.4);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  .footer-links a:hover { color: rgba(255,255,255,0.8); }
+  .footer-copy {
+    font-size: 11px;
+    color: rgba(255,255,255,0.25);
+  }
+  .footer-copy a { color: rgba(255,255,255,0.35); text-decoration: none; }
+  .footer-copy a:hover { color: rgba(255,255,255,0.6); }
+
+  /* TWEAKS */
+  #tweaks-panel {
+    display: none;
+    position: fixed;
+    bottom: 24px; right: 24px;
+    background: #fff;
+    border: 1px solid var(--clr-border);
+    padding: 20px;
+    z-index: 9999;
+    width: 220px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.08);
+    font-family: var(--font-sans);
+    font-size: 12px;
+  }
+  #tweaks-panel h3 { font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; margin-bottom: 16px; font-weight: 500; }
+  #tweaks-panel label { display: block; color: var(--clr-muted); margin-bottom: 4px; margin-top: 14px; font-size: 11px; }
+  #tweaks-panel select, #tweaks-panel input[type=color] {
+    width: 100%; border: 1px solid var(--clr-border); padding: 7px;
+    font-size: 12px; font-family: var(--font-sans); background: var(--clr-bg);
+  }
+
+  @media (max-width: 680px) {
+    .intro-block { grid-template-columns: 1fr; }
+    .special-note { flex-direction: column; }
+    .special-note img, .special-note-ph { width: 100%; height: 220px; }
+    nav li a { padding: 10px 14px; font-size: 10px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- COOKIE BAR -->
+<div class="cookie-bar" id="cookie-bar">
+  <span>Diese Webseite verwendet Cookies zu statistischen Zwecken. Mit der Nutzung erklären Sie sich einverstanden. <a href="#">Weitere Informationen</a></span>
+  <button onclick="acceptCookie()">OK</button>
+</div>
+<script>
+  // Cookie-Bar: nur zeigen wenn noch nicht akzeptiert
+  if (localStorage.getItem('cookieOk')) {
+    document.getElementById('cookie-bar').style.display = 'none';
+  }
+  function acceptCookie() {
+    localStorage.setItem('cookieOk', '1');
+    document.getElementById('cookie-bar').style.display = 'none';
+  }
+</script>
+
+<script src="nav.js?v=7"></script>
+<site-nav active="home"></site-nav>
+
+<!-- HERO + SOCIAL -->
+<div class="hero-social">
+  <img class="hero-bg" src="images/atelier.jpg" alt="Atelierschmuck">
+  <div class="hero-gradient"></div>
+
+  <!-- Text unten links -->
+  <div class="hero-content">
+    <p class="hero-content-label">Ihr Juweliergeschäft in Mödling</p>
+    <h2>Schmuck, der Ihre<br>Persönlichkeit widerspiegelt</h2>
+    <a href="shop.html" class="hero-content-btn">Schmuck entdecken</a>
+  </div>
+
+  <!-- Social Pills unten rechts -->
+  <div class="hero-social-pills">
+    <a class="social-pill" href="https://www.facebook.com/schmuckkulturweiss" target="_blank" rel="noopener">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="#fff"><path d="M22 12c0-5.52-4.48-10-10-10S2 6.48 2 12c0 4.84 3.44 8.87 8 9.8V15H8v-3h2V9.5C10 7.57 11.57 6 13.5 6H16v3h-2c-.55 0-1 .45-1 1v2h3v3h-3v6.95c5.05-.5 9-4.76 9-9.95z"/></svg>
+      <span class="social-pill-name">Schmuckkultur Weiss</span>
+    </a>
+    <a class="social-pill" href="https://www.instagram.com/schmuckkultur.weiss/" target="_blank" rel="noopener">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="#fff" stroke="none"/></svg>
+      <span class="social-pill-name">@schmuckkultur.weiss</span>
+    </a>
+  </div>
+
+  <!-- Scroll-Hint -->
+  <div class="hero-scroll">
+    <div class="hero-scroll-line"></div>
+    <span>Scrollen</span>
+  </div>
+</div>
+<main>
+
+  <!-- CLIQ NOTE -->
+  <div class="special-note">
+    <div class="special-note-ph">Foto: Hände / Cliq-Ring<br>Bitte Bild hochladen</div>
+    <div class="special-note-text">
+      <h3>Wenn sich Hände verändern …</h3>
+      <p>Ringe tragen trotz Arthritis und Rheuma – unsere Cliq-Ringe bieten eine elegante und praktische Lösung für Menschen mit eingeschränkter Fingerbeweglichkeit.</p>
+      <a href="#">Klicken Sie hier für weitere Informationen</a>
+    </div>
+  </div>
+
+  <!-- ADDRESS + INTRO -->
+  <div class="intro-block">
+    <div class="address">
+      <strong>Ihr Juweliergeschäft in Mödling</strong>
+      Schmuckkultur<br>
+      GABRIELE GOLZAR<br>
+      Hauptstraße 71<br>
+      2340 Mödling<br><br>
+      <a href="tel:+43223622790">+43 (2236) 2 27 90</a><br>
+      <a href="mailto:info@schmuckkultur.at">info@schmuckkultur.at</a>
+    </div>
+    <div class="intro-text">
+      <h2>Schmuck, der Ihre Persönlichkeit widerspiegelt</h2>
+      <p>Wir präsentieren einen Streifzug durch die vielgestaltige Schmuckkultur, die Ihre außergewöhnliche Persönlichkeit auf die beste Art widerspiegelt.</p>
+    </div>
+  </div>
+
+  <!-- DESIGNER LIST -->
+
+
+  <!-- SOCIAL -->
+  <div class="social-block">
+    <a class="social-link" href="https://www.facebook.com/schmuckkulturweiss" target="_blank">
+      <svg viewBox="0 0 24 24"><path d="M22 12c0-5.52-4.48-10-10-10S2 6.48 2 12c0 4.84 3.44 8.87 8 9.8V15H8v-3h2V9.5C10 7.57 11.57 6 13.5 6H16v3h-2c-.55 0-1 .45-1 1v2h3v3h-3v6.95c5.05-.5 9-4.76 9-9.95z"/></svg>
+      Find us on Facebook
+    </a>
+  </div>
+
+</main>
+
+<!-- FOOTER -->
+<script src="footer.js?v=1"></script>
+<site-footer></site-footer>
+
+<!-- TWEAKS -->
+<div id="tweaks-panel">
+  <h3>Tweaks</h3>
+  <label>Hintergrund</label>
+  <select id="tweak-bg" onchange="applyBg(this.value)">
+    <option value="warm">Warm Beige</option>
+    <option value="white">Reines Weiß</option>
+    <option value="cool">Kühles Grau</option>
+  </select>
+  <label>Akzentfarbe</label>
+  <input type="color" id="tweak-accent" value="#8c7355" onchange="applyAccent(this.value)">
+  <label>Slideshow-Intervall</label>
+  <select id="tweak-speed" onchange="applySpeed(this.value)">
+    <option value="5000">5 Sekunden</option>
+    <option value="3500" selected>3.5 Sekunden</option>
+    <option value="2000">2 Sekunden</option>
+  </select>
+</div>
+
+<script>
+
+  // ── MEGA MENU ── (now handled by nav.js)
+  window.__toggleMega = function() {
+    const overlay = document.getElementById('mega-overlay');
+    if (overlay) overlay.classList.toggle('open');
+  };
+  function closeMega(e) {
+    if (e.target === document.getElementById('mega-overlay')) {
+      document.getElementById('mega-overlay').classList.remove('open');
+    }
+  }
+  function closeMegaBtn() {
+    document.getElementById('mega-overlay').classList.remove('open');
+  }
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') document.getElementById('mega-overlay').classList.remove('open');
+  });
+
+
+  // keyboard
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowLeft') ssMove(-1);
+    if (e.key === 'ArrowRight') ssMove(1);
+  });
+
+  // ── FAQ ──
+  function toggleFaq(item) {
+    const isOpen = item.classList.contains('open');
+    document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
+    if (!isOpen) item.classList.add('open');
+  }
+
+  // ── TWEAKS ──
+  const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
+    "bg": "warm",
+    "accent": "#8c7355",
+    "speed": "3500"
+  }/*EDITMODE-END*/;
+  let tweaks = {...TWEAK_DEFAULTS};
+
+  function applyBg(v) {
+    const r = document.documentElement;
+    if (v === 'white') {
+      r.style.setProperty('--clr-bg', '#ffffff');
+      r.style.setProperty('--clr-border', '#e8e8e8');
+    } else if (v === 'cool') {
+      r.style.setProperty('--clr-bg', '#f3f4f5');
+      r.style.setProperty('--clr-border', '#dde1e5');
+    } else {
+      r.style.setProperty('--clr-bg', '#f7f4f0');
+      r.style.setProperty('--clr-border', '#ddd8d0');
+    }
+    tweaks.bg = v; postEdits();
+  }
+  function applyAccent(v) {
+    document.documentElement.style.setProperty('--clr-accent', v);
+    tweaks.accent = v; postEdits();
+  }
+  function applySpeed(v) {
+    ssSpeed = parseInt(v);
+    resetInterval();
+    tweaks.speed = v; postEdits();
+  }
+  function postEdits() {
+    window.parent.postMessage({type:'__edit_mode_set_keys', edits: tweaks}, '*');
+  }
+
+  // init
+  applyBg(tweaks.bg); applyAccent(tweaks.accent);
+  document.getElementById('tweak-bg').value = tweaks.bg;
+  document.getElementById('tweak-accent').value = tweaks.accent;
+  document.getElementById('tweak-speed').value = tweaks.speed;
+
+  window.addEventListener('message', e => {
+    if (e.data?.type === '__activate_edit_mode') document.getElementById('tweaks-panel').style.display = 'block';
+    if (e.data?.type === '__deactivate_edit_mode') document.getElementById('tweaks-panel').style.display = 'none';
+  });
+  window.parent.postMessage({type:'__edit_mode_available'}, '*');
+</script>
+</body>
+</html>

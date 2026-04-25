@@ -54,11 +54,11 @@
     }
 
     /* PRODUCT GRID */
-    .kat-grid-wrap { padding: 40px 48px 32px; max-width: 1400px; margin: 0 auto; }
+    .kat-grid-wrap { padding: 32px 48px 24px; max-width: 1400px; margin: 0 auto; }
     .product-grid {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      gap: 20px;
+      gap: 16px;
     }
 
     /* PAGINATION */
@@ -81,20 +81,22 @@
       cursor: pointer;
       transition: box-shadow 0.25s, transform 0.25s;
       display: flex; flex-direction: column;
+      border: 1px solid var(--clr-border);
     }
     .product-card:hover {
       box-shadow: 0 6px 24px rgba(0,0,0,0.08);
       transform: translateY(-2px);
     }
     .product-img {
-      aspect-ratio: 1/1;
+      aspect-ratio: 4/3;
       overflow: hidden;
-      background: var(--clr-light);
+      background: #f0ede9;
       position: relative;
     }
     .product-img img {
-      width: 100%; height: 100%; object-fit: cover;
-      transition: transform 0.6s ease;
+      width: 100%; height: 100%; object-fit: contain;
+      transition: transform 0.4s ease;
+      padding: 8px;
     }
     .product-card:hover .product-img img { transform: scale(1.05); }
     .product-img-ph {
@@ -108,9 +110,9 @@
       font-size: 8px; letter-spacing: 0.2em; text-transform: uppercase;
       padding: 4px 10px; font-family: var(--font-sans);
     }
-    .product-info { padding: 16px 18px 20px; flex: 1; display: flex; flex-direction: column; gap: 6px; }
+    .product-info { padding: 12px 14px 14px; display: flex; flex-direction: column; gap: 4px; }
     .product-designer { font-size: 9px; letter-spacing: 0.22em; text-transform: uppercase; color: var(--clr-accent); }
-    .product-name { font-family: var(--font-serif); font-size: 15px; font-weight: 400; line-height: 1.25; color: var(--clr-text); flex: 1; }
+    .product-name { font-family: var(--font-serif); font-size: 14px; font-weight: 400; line-height: 1.25; color: var(--clr-text); margin-bottom: 8px; }
     .product-price { display: none !important; }
     .lightbox-price { display: none !important; }
     .product-anfrage {

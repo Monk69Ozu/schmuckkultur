@@ -156,7 +156,7 @@
     .form-grid { grid-template-columns: 1fr; }
   }
 </style>
-<script src="designers-data.js?v=1"></script>
+<script src="designers-data.js?v=2"></script>
 </head>
 <body>
 
@@ -196,6 +196,10 @@
         <a class="sidebar-link" onclick="showPage('produkte', this)">
           <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="3"/><path d="M12 2v4M12 18v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M2 12h4M18 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>
           Produkte
+        </a>
+        <a class="sidebar-link" onclick="showPage('designer', this)">
+          <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a8 8 0 0116 0v1"/></svg>
+          Designer
         </a>
       </div>
       <div class="sidebar-section">
@@ -253,6 +257,45 @@
         </table>
         <div class="empty-table" id="products-empty" style="display:none">
           <p>Noch keine Produkte vorhanden.<br>Klicke auf „+ Produkt hinzufügen" um zu starten.</p>
+        </div>
+      </div>
+
+      <!-- DESIGNER -->
+      <div class="admin-page" id="page-designer">
+        <div class="section-head">
+          <h2>Designer</h2>
+          <button class="btn btn-primary" onclick="openDesignerModal()">+ Neuer Designer</button>
+        </div>
+        <p style="font-size:12px;color:var(--clr-muted);margin-bottom:20px;line-height:1.7;max-width:680px">
+          Zentrale Verwaltung aller Designer. Erscheint automatisch im Produkt-Dropdown und im Filter auf den Shop-Kategorieseiten.
+        </p>
+        <table class="product-table">
+          <thead><tr><th style="width:60px">Logo</th><th>Name</th><th>Website</th><th style="width:140px"></th></tr></thead>
+          <tbody id="designer-tbody"></tbody>
+        </table>
+      </div>
+
+      <!-- DESIGNER MODAL -->
+      <div id="designer-modal" style="display:none;position:fixed;inset:0;z-index:600;background:rgba(20,16,12,0.6);align-items:center;justify-content:center;padding:32px" onclick="if(event.target===this)closeDesignerModal()">
+        <div style="background:#fff;max-width:480px;width:100%;padding:32px;position:relative">
+          <button onclick="closeDesignerModal()" style="position:absolute;top:14px;right:18px;background:none;border:none;font-size:22px;cursor:pointer;color:var(--clr-muted)">×</button>
+          <h3 id="designer-modal-title" style="margin-bottom:20px">Designer hinzufügen</h3>
+          <div class="form-group">
+            <label>Name *</label>
+            <input type="text" id="d-name" placeholder="z.B. Niessing">
+          </div>
+          <div class="form-group">
+            <label>Website-URL</label>
+            <input type="text" id="d-url" placeholder="https://...">
+          </div>
+          <div class="form-group">
+            <label>Logo-Pfad (optional)</label>
+            <input type="text" id="d-logo" placeholder="images/designer-logos/name.png">
+          </div>
+          <div style="display:flex;gap:8px;margin-top:20px;justify-content:flex-end">
+            <button class="btn btn-outline" onclick="closeDesignerModal()">Abbrechen</button>
+            <button class="btn btn-primary" onclick="saveDesigner()">Speichern</button>
+          </div>
         </div>
       </div>
 
@@ -479,6 +522,7 @@ function showPage(id, el) {
   if (el) el.classList.add('active');
   if (id === 'dashboard') refreshDashboard();
   if (id === 'produkte') renderProductsTable();
+  if (id === 'designer') renderDesignersTable();
 }
 
 // ── PRODUCTS ──
@@ -824,20 +868,116 @@ function checkShopConnection() {
   }
 }
 
-// ── DESIGNER DROPDOWN ──
+// ── DESIGNER MANAGEMENT ──
+const DESIGNERS_KEY = 'schmuck_designers';
+
+function getDesigners() {
+  try {
+    const stored = localStorage.getItem(DESIGNERS_KEY);
+    if (stored) return JSON.parse(stored);
+  } catch (e) {}
+  // Seed from designers-data.js on first run
+  const seed = (window.DESIGNERS || []).slice();
+  localStorage.setItem(DESIGNERS_KEY, JSON.stringify(seed));
+  return seed;
+}
+
+function saveDesigners(arr) {
+  arr.sort((a, b) => a.name.localeCompare(b.name, 'de'));
+  localStorage.setItem(DESIGNERS_KEY, JSON.stringify(arr));
+  window.DESIGNERS = arr; // keep global in sync
+}
+
 function populateDesignerDropdown() {
   const sel = document.getElementById('field-designer');
-  if (!sel || !window.DESIGNERS) return;
+  if (!sel) return;
   const current = sel.value;
-  // Keep first placeholder option, drop rest
   while (sel.options.length > 1) sel.remove(1);
-  window.DESIGNERS.forEach(d => {
+  getDesigners().forEach(d => {
     const opt = document.createElement('option');
     opt.value = d.name; opt.textContent = d.name;
     sel.appendChild(opt);
   });
   if (current) sel.value = current;
 }
+
+function renderDesignersTable() {
+  const tbody = document.getElementById('designer-tbody');
+  if (!tbody) return;
+  const list = getDesigners();
+  if (list.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:var(--clr-muted);padding:32px">Noch keine Designer angelegt.</td></tr>';
+    return;
+  }
+  tbody.innerHTML = list.map((d, i) => `
+    <tr>
+      <td>${d.logo ? `<img src="${escapeAttr(d.logo)}" alt="" style="width:40px;height:40px;object-fit:contain">` : '—'}</td>
+      <td><strong>${escapeHtmlSafe(d.name)}</strong></td>
+      <td>${d.url && d.url !== '#' ? `<a href="${escapeAttr(d.url)}" target="_blank" rel="noopener" style="color:var(--clr-accent);font-size:12px">${escapeHtmlSafe(d.url)}</a>` : '<span style="color:var(--clr-muted)">—</span>'}</td>
+      <td style="text-align:right">
+        <button class="btn btn-outline btn-sm" onclick="openDesignerModal(${i})">Bearbeiten</button>
+        <button class="btn btn-sm" style="color:#c0392b;border:1px solid #e8e2da;background:#fff" onclick="deleteDesigner(${i})">×</button>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function escapeHtmlSafe(s) {
+  return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+function escapeAttr(s) {
+  return String(s == null ? '' : s).replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
+
+let __editDesignerIdx = -1;
+function openDesignerModal(idx) {
+  __editDesignerIdx = (typeof idx === 'number') ? idx : -1;
+  const list = getDesigners();
+  const d = __editDesignerIdx >= 0 ? list[__editDesignerIdx] : { name: '', url: '', logo: '' };
+  document.getElementById('designer-modal-title').textContent = __editDesignerIdx >= 0 ? 'Designer bearbeiten' : 'Designer hinzufügen';
+  document.getElementById('d-name').value = d.name || '';
+  document.getElementById('d-url').value  = d.url  || '';
+  document.getElementById('d-logo').value = d.logo || '';
+  document.getElementById('designer-modal').style.display = 'flex';
+}
+function closeDesignerModal() {
+  document.getElementById('designer-modal').style.display = 'none';
+}
+function saveDesigner() {
+  const name = document.getElementById('d-name').value.trim();
+  if (!name) { alert('Name ist erforderlich.'); return; }
+  const entry = {
+    name,
+    url:  document.getElementById('d-url').value.trim()  || '#',
+    logo: document.getElementById('d-logo').value.trim() || ''
+  };
+  const list = getDesigners();
+  if (__editDesignerIdx >= 0) {
+    list[__editDesignerIdx] = entry;
+  } else {
+    if (list.some(d => d.name.toLowerCase() === name.toLowerCase())) {
+      alert('Ein Designer mit diesem Namen existiert bereits.'); return;
+    }
+    list.push(entry);
+  }
+  saveDesigners(list);
+  closeDesignerModal();
+  renderDesignersTable();
+  populateDesignerDropdown();
+  refreshDashboard();
+  markUnsaved();
+}
+function deleteDesigner(idx) {
+  const list = getDesigners();
+  if (!confirm('Designer "' + list[idx].name + '" wirklich löschen?')) return;
+  list.splice(idx, 1);
+  saveDesigners(list);
+  renderDesignersTable();
+  populateDesignerDropdown();
+  refreshDashboard();
+  markUnsaved();
+}
+
 populateDesignerDropdown();
 
 // ── INIT ──

@@ -40,13 +40,28 @@
   // sort alphabetically by display name (German collation)
   DESIGNERS.sort((a, b) => a.name.localeCompare(b.name, 'de'));
 
-  // expose globally
-  window.DESIGNERS = DESIGNERS;
+  // Load user-managed list from localStorage (managed via CRM).
+  // Falls back to seed list above on first run / if storage empty.
+  const STORAGE_KEY = 'schmuck_designers';
+  let active = DESIGNERS;
+  try {
+    const stored = localStorage.getItem(STORAGE_KEY);
+    if (stored) {
+      const parsed = JSON.parse(stored);
+      if (Array.isArray(parsed) && parsed.length > 0) active = parsed;
+    } else {
+      // seed storage so CRM starts with the full list
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(DESIGNERS));
+    }
+  } catch (e) { /* ignore */ }
 
-  // canonical lookup helpers (case-insensitive match → returns canonical entry)
+  active.sort((a, b) => a.name.localeCompare(b.name, 'de'));
+  window.DESIGNERS = active;
+
+  // canonical lookup helper (case-insensitive match → returns canonical entry)
   window.findDesigner = function (raw) {
     if (!raw) return null;
     const norm = String(raw).trim().toLowerCase();
-    return DESIGNERS.find(d => d.name.toLowerCase() === norm) || null;
+    return (window.DESIGNERS || []).find(d => d.name.toLowerCase() === norm) || null;
   };
 })();

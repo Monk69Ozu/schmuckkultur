@@ -156,7 +156,7 @@
     .form-grid { grid-template-columns: 1fr; }
   }
 </style>
-<script src="designers-data.js?v=2"></script>
+<script src="designers-data.js?v=1"></script>
 </head>
 <body>
 
@@ -244,6 +244,7 @@
         <div class="section-head">
           <h2>Produkte</h2>
           <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button class="btn btn-outline" onclick="normalizeAllProductDesigners()">Designer abgleichen</button>
             <label class="btn btn-outline" style="cursor:pointer">
               CSV importieren
               <input type="file" accept=".csv" onchange="importCSVQuick(this)" style="display:none">
@@ -979,6 +980,64 @@ function deleteDesigner(idx) {
 }
 
 populateDesignerDropdown();
+
+// ── BATCH NORMALIZE PRODUCT DESIGNERS ──
+function normalizeAllProductDesigners() {
+  const products = getProducts();
+  const designers = getDesigners();
+  if (products.length === 0) { alert('Keine Produkte vorhanden.'); return; }
+  if (designers.length === 0) { alert('Keine Designer in der Registry. Bitte zuerst Designer anlegen.'); return; }
+
+  function findBestMatch(raw) {
+    const norm = raw.toLowerCase().replace(/[\s&]+/g, '');
+    let m = designers.find(d => d.name.toLowerCase() === raw.toLowerCase());
+    if (m) return m;
+    m = designers.find(d => d.name.toLowerCase().replace(/[\s&]+/g, '') === norm);
+    if (m) return m;
+    m = designers.find(d => {
+      const dn = d.name.toLowerCase();
+      return dn.includes(raw.toLowerCase()) || raw.toLowerCase().includes(dn);
+    });
+    if (m) return m;
+    const rawTokens = raw.toLowerCase().split(/\s+/).filter(Boolean);
+    if (rawTokens.length > 0) {
+      m = designers.find(d => {
+        const dTokens = d.name.toLowerCase().split(/\s+/);
+        return rawTokens.every(t => dTokens.some(dt => dt === t)) ||
+               dTokens.every(t => rawTokens.some(rt => rt === t));
+      });
+      if (m) return m;
+    }
+    return null;
+  }
+
+  let updated = 0;
+  const unmatched = new Set();
+  products.forEach(p => {
+    const raw = (p.designer || '').trim();
+    if (!raw) return;
+    const match = findBestMatch(raw);
+    if (match) {
+      if (p.designer !== match.name) { p.designer = match.name; updated++; }
+    } else {
+      unmatched.add(raw);
+    }
+  });
+
+  saveProducts(products);
+  renderProductsTable();
+  refreshDashboard();
+  markUnsaved();
+
+  let msg = '✓ ' + updated + ' Produkt' + (updated !== 1 ? 'e' : '') + ' aktualisiert.';
+  if (unmatched.size > 0) {
+    msg += '\n\n⚠ Nicht zugeordnet (' + unmatched.size + '):\n• ' + Array.from(unmatched).join('\n• ') +
+           '\n\nDiese Designer manuell anlegen oder Schreibweise prüfen.';
+  } else if (updated === 0) {
+    msg = 'Alle Produkt-Designer sind bereits korrekt benannt.';
+  }
+  alert(msg);
+}
 
 // ── INIT ──
 if (sessionStorage.getItem('admin_auth')) { refreshAll(); checkShopConnection(); }

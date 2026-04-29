@@ -421,7 +421,7 @@
     const designerSet = new Set();
     filtered.forEach(p => { if (p.designer && p.designer.trim()) designerSet.add(p.designer.trim()); });
     const designers = Array.from(designerSet).sort((a, b) => a.localeCompare(b, 'de'));
-    const filterHtml = (designers.length > 0 && filtered.length > 1)
+    const filterHtml = designers.length > 0
       ? '<div class="kat-filter-wrap"><div class="kat-filter-bar">' +
           '<span class="kat-filter-label">Designer</span>' +
           '<button class="kat-filter-btn active" data-designer="Alle" onclick="__katSetDesigner(\'Alle\')">Alle</button>' +

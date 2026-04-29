@@ -347,9 +347,18 @@
   let __katActiveDesigner = 'Alle';
 
   function applyDesignerFilter() {
-    __katFiltered = __katActiveDesigner === 'Alle'
-      ? __katCategoryProducts.slice()
-      : __katCategoryProducts.filter(p => (p.designer || '').trim() === __katActiveDesigner);
+    if (__katActiveDesigner === 'Alle') {
+      __katFiltered = __katCategoryProducts.slice();
+    } else {
+      const target = __katActiveDesigner.toLowerCase();
+      __katFiltered = __katCategoryProducts.filter(p => {
+        const raw = (p.designer || '').trim();
+        if (!raw) return false;
+        const canonical = (window.findDesigner && window.findDesigner(raw)) || null;
+        const display = canonical ? canonical.name : raw;
+        return display.toLowerCase() === target;
+      });
+    }
     const countEl = document.getElementById('kat-count');
     if (countEl) {
       countEl.textContent = __katFiltered.length + ' ' + (__katFiltered.length === 1 ? 'Stück' : 'Stücke');
@@ -375,7 +384,9 @@
     grid.innerHTML = pageItems.map(p => {
       const idx = __katAllProducts.indexOf(p);
       const name = escapeHtml(p.name);
-      const designer = escapeHtml(p.designer || '');
+      const rawDesigner = (p.designer || '').trim();
+      const canonical = (window.findDesigner && window.findDesigner(rawDesigner)) || null;
+      const designer = escapeHtml(canonical ? canonical.name : rawDesigner);
       const foto = escapeHtml(p.foto || '');
       return '<div class="product-card" onclick="__katOpenLightbox(' + idx + ')">' +
         '<div class="product-img">' +
@@ -417,10 +428,16 @@
     __katCategoryProducts = filtered;
     __katAllProducts = products;
 
-    // Build unique designer list (sorted)
-    const designerSet = new Set();
-    filtered.forEach(p => { if (p.designer && p.designer.trim()) designerSet.add(p.designer.trim()); });
-    const designers = Array.from(designerSet).sort((a, b) => a.localeCompare(b, 'de'));
+    // Build unique designer list — canonicalized via designers-data.js if available
+    const seen = new Map(); // lowercase → canonical display name
+    filtered.forEach(p => {
+      const raw = (p.designer || '').trim();
+      if (!raw) return;
+      const canonical = (window.findDesigner && window.findDesigner(raw)) || null;
+      const display = canonical ? canonical.name : raw;
+      seen.set(display.toLowerCase(), display);
+    });
+    const designers = Array.from(seen.values()).sort((a, b) => a.localeCompare(b, 'de'));
     const filterHtml = designers.length > 0
       ? '<div class="kat-filter-wrap"><div class="kat-filter-bar">' +
           '<span class="kat-filter-label">Designer</span>' +

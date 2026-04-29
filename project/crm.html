@@ -156,6 +156,7 @@
     .form-grid { grid-template-columns: 1fr; }
   }
 </style>
+<script src="designers-data.js?v=1"></script>
 </head>
 <body>
 
@@ -348,7 +349,9 @@
         </div>
         <div class="form-group">
           <label>Designer</label>
-          <input type="text" id="field-designer" placeholder="z.B. Niessing">
+          <select id="field-designer">
+            <option value="">— Designer wählen —</option>
+          </select>
         </div>
         <div class="form-group">
           <label>Kategorie</label>
@@ -820,6 +823,22 @@ function checkShopConnection() {
     sub.textContent = 'Kategorien: ' + kats.join(', ');
   }
 }
+
+// ── DESIGNER DROPDOWN ──
+function populateDesignerDropdown() {
+  const sel = document.getElementById('field-designer');
+  if (!sel || !window.DESIGNERS) return;
+  const current = sel.value;
+  // Keep first placeholder option, drop rest
+  while (sel.options.length > 1) sel.remove(1);
+  window.DESIGNERS.forEach(d => {
+    const opt = document.createElement('option');
+    opt.value = d.name; opt.textContent = d.name;
+    sel.appendChild(opt);
+  });
+  if (current) sel.value = current;
+}
+populateDesignerDropdown();
 
 // ── INIT ──
 if (sessionStorage.getItem('admin_auth')) { refreshAll(); checkShopConnection(); }

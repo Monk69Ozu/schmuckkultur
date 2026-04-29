@@ -303,6 +303,29 @@
       <!-- EINSTELLUNGEN -->
       <div class="admin-page" id="page-einstellungen">
         <div class="section-head"><h2>Einstellungen</h2></div>
+
+        <!-- GITHUB SYNC -->
+        <div style="background:#fff;border:1px solid var(--clr-border);padding:32px;max-width:560px;margin-bottom:24px">
+          <h3 style="margin-bottom:8px">Cloud-Speicher (GitHub)</h3>
+          <p style="font-size:12px;color:var(--clr-muted);margin-bottom:20px;line-height:1.7">
+            Speichert Produkte und Designer dauerhaft auf GitHub. Daten bleiben über alle Geräte und Updates erhalten. Den Token einmal eintragen — dann reicht 1 Klick zum Speichern.
+          </p>
+          <div class="form-group" style="margin-bottom:14px">
+            <label>GitHub Personal Access Token</label>
+            <input type="password" id="gh-token" placeholder="ghp_... oder github_pat_...">
+            <p style="font-size:11px;color:var(--clr-muted);margin-top:6px">Wird nur in deinem Browser gespeichert. <a href="https://github.com/settings/tokens/new?scopes=repo&description=Schmuckkultur%20CRM" target="_blank" style="color:var(--clr-accent)">Token erstellen</a> (Scope: repo)</p>
+          </div>
+          <div class="form-group" style="margin-bottom:14px">
+            <label>Repository (Owner/Name)</label>
+            <input type="text" id="gh-repo" placeholder="Monk69Ozu/schmuckkultur" value="Monk69Ozu/schmuckkultur">
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:18px">
+            <button class="btn btn-outline" onclick="saveGhSettings()">Token speichern</button>
+            <button class="btn btn-primary" onclick="syncToGitHub()" id="gh-sync-btn">↑ Jetzt zu GitHub speichern</button>
+          </div>
+          <p id="gh-sync-msg" style="display:none;font-size:12px;margin-top:14px;line-height:1.6"></p>
+        </div>
+
         <div style="background:#fff;border:1px solid var(--clr-border);padding:32px;max-width:480px;">
           <div class="form-group" style="margin-bottom:20px">
             <label>Passwort ändern</label>
@@ -981,6 +1004,105 @@ function deleteDesigner(idx) {
 
 populateDesignerDropdown();
 
+// ── GITHUB SYNC ──
+const GH_TOKEN_KEY = 'schmuck_gh_token';
+const GH_REPO_KEY  = 'schmuck_gh_repo';
+
+function loadGhSettings() {
+  const tok = document.getElementById('gh-token');
+  const rep = document.getElementById('gh-repo');
+  if (tok) tok.value = localStorage.getItem(GH_TOKEN_KEY) || '';
+  if (rep) rep.value = localStorage.getItem(GH_REPO_KEY)  || 'Monk69Ozu/schmuckkultur';
+}
+loadGhSettings();
+
+function saveGhSettings() {
+  const tok = document.getElementById('gh-token').value.trim();
+  const rep = document.getElementById('gh-repo').value.trim();
+  if (tok) localStorage.setItem(GH_TOKEN_KEY, tok);
+  if (rep) localStorage.setItem(GH_REPO_KEY, rep);
+  showGhMsg('✓ Einstellungen gespeichert.', '#27ae60');
+}
+
+function showGhMsg(text, color) {
+  const el = document.getElementById('gh-sync-msg');
+  if (!el) return;
+  el.style.display = 'block';
+  el.style.color = color || 'var(--clr-text)';
+  el.innerHTML = text.replace(/\n/g, '<br>');
+}
+
+// Base64 with proper UTF-8 handling (btoa fails on ä/ö/ü/€ etc.)
+function utf8ToBase64(str) {
+  return btoa(unescape(encodeURIComponent(str)));
+}
+
+async function ghPutFile(token, repo, path, content, message) {
+  // Get current SHA (file might exist or not)
+  let sha;
+  try {
+    const r = await fetch('https://api.github.com/repos/' + repo + '/contents/' + path, {
+      headers: { 'Authorization': 'token ' + token, 'Accept': 'application/vnd.github+json' }
+    });
+    if (r.ok) { const j = await r.json(); sha = j.sha; }
+  } catch (e) {}
+
+  const body = { message, content: utf8ToBase64(content) };
+  if (sha) body.sha = sha;
+
+  const res = await fetch('https://api.github.com/repos/' + repo + '/contents/' + path, {
+    method: 'PUT',
+    headers: {
+      'Authorization': 'token ' + token,
+      'Accept': 'application/vnd.github+json',
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(body)
+  });
+  if (!res.ok) {
+    const err = await res.text();
+    throw new Error(res.status + ': ' + err);
+  }
+  return res.json();
+}
+
+async function syncToGitHub() {
+  const token = (document.getElementById('gh-token').value || localStorage.getItem(GH_TOKEN_KEY) || '').trim();
+  const repo  = (document.getElementById('gh-repo').value  || localStorage.getItem(GH_REPO_KEY)  || '').trim();
+  if (!token) { showGhMsg('⚠ Bitte zuerst einen GitHub Token eintragen.', '#e67e22'); return; }
+  if (!repo)  { showGhMsg('⚠ Repository fehlt (z.B. Monk69Ozu/schmuckkultur).', '#e67e22'); return; }
+
+  // Persist settings on use
+  localStorage.setItem(GH_TOKEN_KEY, token);
+  localStorage.setItem(GH_REPO_KEY, repo);
+
+  const btn = document.getElementById('gh-sync-btn');
+  btn.disabled = true; btn.textContent = 'Wird hochgeladen…';
+  showGhMsg('Lade Daten zu GitHub…', 'var(--clr-muted)');
+
+  try {
+    const products  = JSON.stringify(getProducts(), null, 2);
+    const designers = JSON.stringify(getDesigners(), null, 2);
+    const ts = new Date().toISOString().replace('T', ' ').slice(0, 16);
+
+    await ghPutFile(token, repo, 'project/products-data.json',  products,  'CRM sync: products (' + ts + ')');
+    await ghPutFile(token, repo, 'project/designers-data.json', designers, 'CRM sync: designers (' + ts + ')');
+
+    showGhMsg('✓ Erfolgreich gespeichert!\nIn ~1 Minute live auf der Website. Daten sind jetzt dauerhaft gesichert.', '#27ae60');
+    markSaved();
+  } catch (e) {
+    let hint = '';
+    if (String(e).includes('401') || String(e).includes('403')) {
+      hint = '\nToken ungültig oder ohne Schreibrechte. Neuen Token mit Scope "repo" erstellen.';
+    } else if (String(e).includes('404')) {
+      hint = '\nRepository nicht gefunden. Schreibweise prüfen (Owner/Name).';
+    }
+    showGhMsg('✗ Fehler: ' + e.message + hint, '#c0392b');
+  } finally {
+    btn.disabled = false; btn.textContent = '↑ Jetzt zu GitHub speichern';
+  }
+}
+
 // ── BATCH NORMALIZE PRODUCT DESIGNERS ──
 function normalizeAllProductDesigners() {
   const products = getProducts();
@@ -1039,8 +1161,31 @@ function normalizeAllProductDesigners() {
   alert(msg);
 }
 
+// ── BOOTSTRAP FROM CLOUD ──
+// On every load, pull canonical data from GitHub (products-data.json + designers-data.json)
+// so admin sees the same data on every device. Local edits go back to localStorage and
+// must be synced back via "↑ Jetzt zu GitHub speichern".
+async function bootstrapFromCloud() {
+  try {
+    const [pr, dr] = await Promise.allSettled([
+      fetch('products-data.json?ts=' + Date.now(), { cache: 'no-store' }).then(r => r.ok ? r.json() : null),
+      fetch('designers-data.json?ts=' + Date.now(), { cache: 'no-store' }).then(r => r.ok ? r.json() : null)
+    ]);
+    if (pr.status === 'fulfilled' && Array.isArray(pr.value)) {
+      localStorage.setItem(PRODUCTS_KEY, JSON.stringify(pr.value));
+    }
+    if (dr.status === 'fulfilled' && Array.isArray(dr.value) && dr.value.length > 0) {
+      localStorage.setItem(DESIGNERS_KEY, JSON.stringify(dr.value));
+    }
+  } catch (e) { /* offline → use what's already in localStorage */ }
+}
+
 // ── INIT ──
-if (sessionStorage.getItem('admin_auth')) { refreshAll(); checkShopConnection(); }
+(async function () {
+  await bootstrapFromCloud();
+  populateDesignerDropdown();
+  if (sessionStorage.getItem('admin_auth')) { refreshAll(); checkShopConnection(); }
+})();
 </script>
 </body>
 </html>

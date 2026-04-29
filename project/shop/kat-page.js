@@ -555,9 +555,25 @@
   });
 
   /* ── INIT ──────────────────────────────────────────────────────────── */
+  // Always fetch products-data.json so visitors see latest data even on a fresh device.
+  // localStorage is only used as a fast cache; the JSON file is the source of truth.
+  async function initProducts() {
+    try {
+      const res = await fetch('../products-data.json?ts=' + Date.now(), { cache: 'no-store' });
+      if (res.ok) {
+        const data = await res.json();
+        if (Array.isArray(data)) {
+          localStorage.setItem(PRODUCTS_KEY, JSON.stringify(data));
+        }
+      }
+    } catch (e) { /* offline: fall back to localStorage */ }
+  }
+
+  function go() { initProducts().then(build); }
+
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', build);
+    document.addEventListener('DOMContentLoaded', go);
   } else {
-    build();
+    go();
   }
 })();

@@ -55,6 +55,36 @@
       text-transform: uppercase; display: block; margin-top: 28px;
     }
 
+    /* DESIGNER FILTER */
+    .kat-filter-wrap {
+      max-width: 1320px; margin: 0 auto;
+      padding: 0 56px 8px; text-align: center;
+    }
+    .kat-filter-bar {
+      display: inline-flex; flex-wrap: wrap; justify-content: center;
+      gap: 0; padding: 14px 8px; border-top: 1px solid var(--clr-border);
+      border-bottom: 1px solid var(--clr-border); width: 100%;
+      align-items: center;
+    }
+    .kat-filter-label {
+      font-size: 9px; letter-spacing: 0.32em; text-transform: uppercase;
+      color: var(--clr-muted); font-weight: 500; margin-right: 18px;
+      padding: 6px 0;
+    }
+    .kat-filter-btn {
+      font-family: var(--font-sans); font-size: 11px; letter-spacing: 0.18em;
+      text-transform: uppercase; padding: 8px 14px;
+      background: transparent; border: none;
+      color: var(--clr-muted); cursor: pointer; transition: color 0.2s;
+      font-weight: 400; position: relative;
+    }
+    .kat-filter-btn:hover { color: var(--clr-accent); }
+    .kat-filter-btn.active { color: var(--clr-text); font-weight: 500; }
+    .kat-filter-btn.active::after {
+      content: ''; position: absolute; bottom: 2px; left: 14px; right: 14px;
+      height: 1px; background: var(--clr-accent);
+    }
+
     /* PRODUCT GRID */
     .kat-grid-wrap {
       max-width: 1320px; margin: 0 auto;
@@ -266,6 +296,9 @@
       .product-grid { grid-template-columns: repeat(2, 1fr); gap: 32px 20px; }
       .kat-grid-wrap { padding: 16px 20px 24px; }
       .kat-header { padding: 32px 20px 40px; }
+      .kat-filter-wrap { padding: 0 20px 8px; }
+      .kat-filter-bar { padding: 10px 4px; }
+      .kat-filter-label { width: 100%; margin: 0 0 4px; text-align: center; }
       .kat-breadcrumb { padding: 20px 20px 0; }
       .kat-strip { padding: 40px 20px 48px; }
       .kat-pagination { padding: 32px 20px 56px; }
@@ -310,6 +343,27 @@
   let __katCurrentPage = 0;
   let __katFiltered = [];
   let __katAllProducts = [];
+  let __katCategoryProducts = [];
+  let __katActiveDesigner = 'Alle';
+
+  function applyDesignerFilter() {
+    __katFiltered = __katActiveDesigner === 'Alle'
+      ? __katCategoryProducts.slice()
+      : __katCategoryProducts.filter(p => (p.designer || '').trim() === __katActiveDesigner);
+    const countEl = document.getElementById('kat-count');
+    if (countEl) {
+      countEl.textContent = __katFiltered.length + ' ' + (__katFiltered.length === 1 ? 'Stück' : 'Stücke');
+    }
+    renderPage(0);
+  }
+
+  window.__katSetDesigner = function(name) {
+    __katActiveDesigner = name;
+    document.querySelectorAll('.kat-filter-btn').forEach(b => {
+      b.classList.toggle('active', b.dataset.designer === name);
+    });
+    applyDesignerFilter();
+  };
 
   function renderPage(page) {
     __katCurrentPage = page;
@@ -360,7 +414,22 @@
     const products = getProducts();
     const filtered = products.filter(p => p.kategorie === KAT.filter);
     __katFiltered = filtered;
+    __katCategoryProducts = filtered;
     __katAllProducts = products;
+
+    // Build unique designer list (sorted)
+    const designerSet = new Set();
+    filtered.forEach(p => { if (p.designer && p.designer.trim()) designerSet.add(p.designer.trim()); });
+    const designers = Array.from(designerSet).sort((a, b) => a.localeCompare(b, 'de'));
+    const filterHtml = (designers.length > 0 && filtered.length > 1)
+      ? '<div class="kat-filter-wrap"><div class="kat-filter-bar">' +
+          '<span class="kat-filter-label">Designer</span>' +
+          '<button class="kat-filter-btn active" data-designer="Alle" onclick="__katSetDesigner(\'Alle\')">Alle</button>' +
+          designers.map(d =>
+            '<button class="kat-filter-btn" data-designer="' + escapeHtml(d) + '" onclick="__katSetDesigner(' + JSON.stringify(d).replace(/"/g, '&quot;') + ')">' + escapeHtml(d) + '</button>'
+          ).join('') +
+        '</div></div>'
+      : '';
 
     const katStripLinks = ALLE_KAT.map(k =>
       '<a class="kat-strip-link' + (k.filter === KAT.filter ? ' current' : '') + '" href="' + k.slug + '.html">' + k.label + '</a>'
@@ -402,8 +471,10 @@
         '<p class="kat-header-label">Unsere Kollektion</p>' +
         '<h1>' + KAT.label + '</h1>' +
         (KAT.desc ? '<p class="kat-header-desc">' + KAT.desc + '</p>' : '') +
-        '<span class="kat-count">' + filtered.length + ' ' + (filtered.length === 1 ? 'Stück' : 'Stücke') + '</span>' +
+        '<span class="kat-count" id="kat-count">' + filtered.length + ' ' + (filtered.length === 1 ? 'Stück' : 'Stücke') + '</span>' +
       '</div>' +
+
+      filterHtml +
 
       '<div class="kat-grid-wrap"><div class="product-grid" id="kat-grid"></div></div>' +
       '<div class="kat-pagination" id="kat-pagination"></div>' +

@@ -162,7 +162,7 @@ function page({ file, title, desc, active, content, extraHead = '', bodyClass = 
 <title>${esc(title)}</title>
 <meta name="description" content="${esc(desc)}">
 <meta name="robots" content="noindex, nofollow, noarchive">
-<link rel="icon" href="images/logo.jpg">
+<link rel="icon" href="favicon.png" type="image/png">
 <link rel="stylesheet" href="style.css">
 ${extraHead}</head>
 <body class="${bodyClass}">
@@ -183,6 +183,7 @@ ${content}
       <a href="${IG_URL}" target="_blank" rel="noopener" aria-label="Instagram">${ICON_IG}</a>
       <a href="${FB_URL}" target="_blank" rel="noopener" aria-label="Facebook">${ICON_FB}</a>
     </div>
+    <p class="foot-info">Schmuckkultur RENATE WEISS · Hauptstraße 71, 2340 Mödling · Di–Fr 9:30–12:30 &amp; 15:00–18:00 Uhr, Sa 9:30–12:30 Uhr</p>
     <p class="foot-links"><a href="impressum.html">Impressum</a> · <a href="impressum.html#datenschutz">Datenschutz</a></p>
   </footer>
 </div>
@@ -279,14 +280,24 @@ fs.writeFileSync(path.join(OUT, 'firma.html'), page({
   </div>`,
 }));
 
-// --- Schmuck-Übersicht ---
+// --- Schmuck-Übersicht: eine Bildkachel pro Kategorie (jeweils erstes Produktbild) ---
+const catTiles = CATS.map((c) => {
+  const first = products[c.slug][0];
+  if (!first) return '';
+  return `      <a class="cat-tile" href="schmuck-${c.slug}.html">
+        <span class="cat-tile-img"><img src="${first.img}"${img2x(first.img)} alt="${esc(c.label)} – Schmuckkultur" loading="lazy"></span>
+        <span class="cat-tile-label">${esc(c.label)}</span>
+      </a>`;
+}).join('\n');
 fs.writeFileSync(path.join(OUT, 'schmuck.html'), page({
   file: 'schmuck.html', title: 'Schmuck | Schmuckkultur Renate Weiss',
   desc: 'Ringe, Trauringe, Ohrschmuck, Halsschmuck, Perlen und mehr – Designschmuck bei Schmuckkultur Renate Weiss in Mödling.',
   active: 'schmuck',
   content: `  <div class="layout">
     ${schmuckRail(null)}
-    <div class="content-img"><img src="images/section_ringe.jpg"${img2x('images/section_ringe.jpg')} alt="Designring – Schmuckkultur"></div>
+    <div class="cat-grid">
+${catTiles}
+    </div>
   </div>`,
 }));
 
@@ -300,8 +311,12 @@ for (const c of CATS) {
     <div class="viewer" id="viewer">
       <div class="v-main">
         <button class="v-arrow v-prev" aria-label="Vorheriges Schmuckstück">‹</button>
-        <img id="v-img" src="${items[0] ? items[0].img : ''}" alt="Schmuckstück – ${esc(c.label)}">
+        <img id="v-img" src="${items[0] ? items[0].img : ''}" alt="Schmuckstück – ${esc(c.label)}" title="Zum Vergrößern klicken">
         <button class="v-arrow v-next" aria-label="Nächstes Schmuckstück">›</button>
+      </div>
+      <div class="lightbox" id="v-lightbox" hidden>
+        <button class="lb-close" aria-label="Vergrößerung schließen">×</button>
+        <img id="lb-img" src="" alt="Schmuckstück in Großansicht">
       </div>
       <p class="v-caption" id="v-caption"></p>
       <div class="v-thumbs" id="v-thumbs">
@@ -590,6 +605,23 @@ nav a.active { border-bottom-color: #000; }
 .thumb-list a { display: block; border: 1px solid var(--line); line-height: 0; }
 .thumb-list a:hover { border-color: #000; }
 
+/* Kategorie-Kacheln (Schmuck-Übersicht) */
+.cat-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 22px; align-content: start; }
+.cat-tile { display: block; color: #000; }
+.cat-tile:hover { text-decoration: none; }
+.cat-tile-img { display: flex; align-items: center; justify-content: center; aspect-ratio: 1; border: 1px solid var(--line); background: #fff; padding: 12px; }
+.cat-tile:hover .cat-tile-img { border-color: #000; }
+.cat-tile-img img { max-width: 100%; max-height: 100%; width: auto; height: auto; object-fit: contain; }
+.cat-tile-label { display: block; text-align: center; font-size: 13px; margin-top: 8px; text-transform: lowercase; color: var(--muted); }
+.cat-tile:hover .cat-tile-label { color: #000; }
+
+/* Lightbox (Zoom) */
+.lightbox { position: fixed; inset: 0; background: rgba(255,255,255,0.97); z-index: 60; display: flex; align-items: center; justify-content: center; cursor: zoom-out; }
+.lightbox[hidden] { display: none; }
+.lightbox img { max-width: 94vw; max-height: 94vh; width: auto; height: auto; }
+.lb-close { position: absolute; top: 14px; right: 18px; border: 1px solid var(--line); background: #fff; font-size: 26px; line-height: 1; width: 44px; height: 44px; cursor: pointer; }
+.lb-close:hover { border-color: #000; }
+
 /* Rechtstexte */
 .legal { font-size: 14px; }
 .legal h2 { margin-top: 30px; }
@@ -604,7 +636,8 @@ footer { display: flex; align-items: center; justify-content: space-between; bor
 .social a { color: #7a7a7a; }
 .social a:hover { color: #000; }
 .social svg { width: 22px; height: 22px; }
-.foot-links { margin: 0; font-size: 12px; }
+.foot-info { margin: 0; font-size: 12px; color: var(--muted); text-align: center; flex: 1; padding: 0 16px; }
+.foot-links { margin: 0; font-size: 12px; white-space: nowrap; }
 .foot-links a { color: var(--muted); }
 
 /* ============ Mobil / Tablet ============ */
@@ -718,6 +751,8 @@ fs.writeFileSync(path.join(OUT, 'viewer.js'), `// Schmuck-Viewer (ohne Fremdbibl
   document.querySelector('.v-prev').addEventListener('click', function () { show(idx - 1); });
   document.querySelector('.v-next').addEventListener('click', function () { show(idx + 1); });
   document.addEventListener('keydown', function (e) {
+    var lbEl = document.getElementById('v-lightbox');
+    if (lbEl && !lbEl.hidden) return; // Lightbox offen → deren eigener Handler übernimmt
     if (e.key === 'ArrowLeft') show(idx - 1);
     if (e.key === 'ArrowRight') show(idx + 1);
   });
@@ -729,6 +764,26 @@ fs.writeFileSync(path.join(OUT, 'viewer.js'), `// Schmuck-Viewer (ohne Fremdbibl
     var dx = e.clientX - x0; x0 = null;
     if (Math.abs(dx) > 40) show(idx + (dx < 0 ? 1 : -1));
   });
+  // Zoom: Klick aufs Bild öffnet die Großansicht (beste verfügbare Auflösung)
+  var lb = document.getElementById('v-lightbox');
+  var lbImg = document.getElementById('lb-img');
+  function openLb() {
+    var p = items[idx];
+    lbImg.src = p.img2x || p.img;
+    lb.hidden = false;
+    document.body.style.overflow = 'hidden';
+  }
+  function closeLb() { lb.hidden = true; lbImg.src = ''; document.body.style.overflow = ''; }
+  img.addEventListener('click', openLb);
+  img.style.cursor = 'zoom-in';
+  lb.addEventListener('click', closeLb);
+  document.addEventListener('keydown', function (e) {
+    if (lb.hidden) return;
+    if (e.key === 'Escape') closeLb();
+    if (e.key === 'ArrowLeft') { show(idx - 1); lbImg.src = items[idx].img2x || items[idx].img; }
+    if (e.key === 'ArrowRight') { show(idx + 1); lbImg.src = items[idx].img2x || items[idx].img; }
+  });
+
   var start = 0;
   var hm = location.hash.match(/^#p(\\w+)$/);
   if (hm) {

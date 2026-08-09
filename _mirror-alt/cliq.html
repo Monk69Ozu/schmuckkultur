@@ -1,0 +1,79 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>Renate Weiss - cliQ System</title>
+<link href="default.css" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="js/jquery-1.7.2.js"></script>
+<script type="text/javascript" src="js/fadeslideshow.js"></script>
+
+<script type='text/javascript'>
+jQuery.noConflict(); // start substituting $ for jQuery
+jQuery(document).ready(function(){
+    if ( (window.devicePixelRatio) && (window.devicePixelRatio >= 2) )
+    {
+        var images = jQuery('img.hd');        
+
+        for(var i=0; i<images.length; i++)
+        {
+            images.eq(i).attr('src', images.eq(i).attr('src').replace('.gif', '@2x.gif'))
+			images.eq(i).attr('src', images.eq(i).attr('src').replace('.jpg', '@2x.jpg'))
+        }
+    }
+});</script>
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-35092315-1']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+</head>
+
+<body>
+
+<div id="page">
+<div id="logo">
+	<h1><a href="index.php"><img src="images/logo.jpg" width="330" height="90" class="hd" alt="Renate Weiss - Designschmuck Perlen"/></a></h1>
+</div>
+<div id="menu">
+	<ul>
+		<li><a href="firma.html" title="">Firma</a></li>
+		<li><a href="schmuck.html" title="">Schmuck</a></li>
+		<li><a href="designer.php" title="">Designer</a></li>
+		<li><a href="kooperationen.php" title="">Kooperationen</a></li>
+	    <li><a href="links.html" title="">Links</a></li>
+        <li><a href="kontakt.html" title="">Kontakt</a></li>
+	</ul>
+</div>
+<div id ="content">
+	<div class="pictureleft" ><img src="images/cliq-system.jpg"/></div>
+    <div class="captionright" >
+      <h2>Wenn sich H&auml;nde ver&auml;ndern - Das cliQ&reg; Superfit System</h2>
+      <p style="padding-top:5px;">Diese Technologie wurde in Zusammenarbeit mit der amerikanischen Rheuma-Gesellschaft erarbeitet.
+Es macht keinen Unterschied, ob Ihr Lieblingsring, ganz rund, mit oder ohne Steinen, oder ein Cocktailring ist. 
+</p><p>Dieses neue, hochwertige "CliQ"- System, k&ouml;nnen wir mit jedem Ring verbinden.
+Auch wenn sich Ihre H&auml;nde ver&auml;ndern, werden Ihre Ringe Sie wieder mit komfortabler Passform begleiten!
+      </p>
+      <p><a href="http://www.meinbezirk.at/moedling/magazin/ringe-tragen-trotz-arthritis-und-rheuma-d522087.html" target="_blank">Artikel im M&ouml;dlinger Bezirksblatt ansehen</a></p>
+    </div>
+</div>
+
+ 
+
+<div id="footer">
+	
+	 
+	<p id="links"><a href="impressum.html">Impressum</a></p> 
+
+</div>
+</div>
+</body>
+</html>

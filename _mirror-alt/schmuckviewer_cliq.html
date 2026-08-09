@@ -1,0 +1,137 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>Renate Weiss - cliQ System</title>
+<link href="default.css" rel="stylesheet" type="text/css" />
+
+<link rel="stylesheet" href="js/royalslider/royalslider.css">
+  <link rel="stylesheet" href="js/royalslider/default/rs-default.css"> 
+  <script src='js/royalslider/jquery-1.8.0.min.js'></script>
+  <script src="js/royalslider/jquery.royalslider.min.js"></script>
+
+  <style>
+      #gallery-photo {
+        width: 540px;
+        margin:auto;
+        margin-bottom:200px;
+        float:right;
+      }
+
+  </style>
+
+
+<script type='text/javascript'>
+jQuery.noConflict(); // start substituting $ for jQuery
+jQuery(document).ready(function(){
+    if ( (window.devicePixelRatio) && (window.devicePixelRatio >= 2) )
+    {
+        var images = jQuery('img.hd');        
+
+        for(var i=0; i<images.length; i++)
+        {
+            images.eq(i).attr('src', images.eq(i).attr('src').replace('.gif', '@2x.gif'))
+			images.eq(i).attr('src', images.eq(i).attr('src').replace('.jpg', '@2x.jpg'))
+        }
+    }
+});</script>
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-35092315-1']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+</head>
+
+<body>
+
+<div id="page">
+<div id="logo">
+	<h1><a href="index.php"><img src="images/logo.jpg" width="330" height="90" class="hd" alt="Renate Weiss - Designschmuck Perlen"/></a></h1>
+</div>
+<div id="menu">
+	<ul>
+		<li><a href="firma.html" title="">Firma</a></li>
+		<li><a href="schmuck.html" title="">Schmuck</a></li>
+		<li><a href="designer.php" title="">Designer</a></li>
+		<li><a href="kooperationen.php" title="">Kooperationen</a></li>
+	    <li><a href="links.html" title="">Links</a></li>
+        <li><a href="kontakt.html" title="">Kontakt</a></li>
+	</ul>
+</div>
+<div id ="content">    
+
+		<div id="sidebar">
+                <p><a href="schmuckviewer.php?category=ringe">ringe</a></p>
+                <p><a href="schmuckviewer.php?category=trauringe">trauringe</a></p>
+                <p><a href="schmuckviewer.php?category=ohrschmuck">ohrschmuck</a></p>
+                <p><a href="schmuckviewer.php?category=halsschmuck">halsschmuck</a></p>
+                <p><a href="schmuckviewer.php?category=perlen">perlen</a></p>
+                <p><a href="schmuckviewer.php?category=armschmuck">armschmuck</a></p>
+                <p><a href="schmuckviewer.php?category=ansteckschmuck">ansteckschmuck</a></p>
+                <p><a href="schmuckviewer.php?category=maennersache"> männersache</a></p>
+                <p><a href="schmuckviewer.php?category=uhren">uhren</a></p>
+                <p><a href="schmuckviewer.php?category=bluetooth">bluetooth headsets</a></p>
+                <p><a href="schmuckviewer_cliq.html">cliq® system</a></p>
+
+                
+	</div> 
+<div class="captionright">
+      <h2>Wenn sich Hände verändern - Das cliQ® Superfit System</h2>
+      <p style="padding-top:5px;">Diese Technologie wurde in Zusammenarbeit mit der amerikanischen Rheuma-Gesellschaft erarbeitet.
+Es macht keinen Unterschied, ob Ihr Lieblingsring, ganz rund, mit oder ohne Steinen, oder ein Cocktailring ist. 
+</p><p>Dieses neue, hochwertige "CliQ"- System, können wir mit jedem Ring verbinden.
+Auch wenn sich Ihre Hände verändern, werden Ihre Ringe Sie wieder mit komfortabler Passform begleiten!
+      </p>
+      <p><a href="http://www.meinbezirk.at/moedling/magazin/ringe-tragen-trotz-arthritis-und-rheuma-d522087.html" target="_blank">Artikel im M&ouml;dlinger Bezirksblatt ansehen</a></p>
+    </div>
+    <div><div id="gallery-photo" class="royalSlider"><div class="rsContent"><a class="rsImg" data-rsdelay="1000"href="./images/cliq/226.jpg"></a></div></div></div>    
+</div>
+
+
+<div id="footer"> 
+	<p id="links"><a href="impressum.html">Impressum</a></p> 
+</div>
+</div>
+<script>
+  jQuery(document).ready(function($) {
+    $('#gallery-photo').royalSlider({
+            fullscreen: {
+        enabled: true,
+        nativeFS: false
+      },
+      autoScaleSlider: true, 
+      autoScaleSliderWidth: 540,     
+      autoScaleSliderHeight: 550,
+      loop: false,
+      globalCaption:true
+    });
+  });
+</script>
+<script>
+  !function(f,b,e,v,n,t,s)
+  {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+  n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+  if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+  n.queue=[];t=b.createElement(e);t.async=!0;
+  t.src=v;s=b.getElementsByTagName(e)[0];
+  s.parentNode.insertBefore(t,s)}(window, document,'script',
+  'https://connect.facebook.net/en_US/fbevents.js');
+  fbq('init', '1776846295969358');
+  fbq('track', 'PageView');
+  fbq('track', 'ViewContent');
+</script>
+<noscript><img height="1" width="1" style="display:none"
+  src="https://www.facebook.com/tr?id=1776846295969358&ev=PageView&noscript=1"
+/></noscript>
+</body>
+</html>

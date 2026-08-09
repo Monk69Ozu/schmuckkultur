@@ -7,6 +7,7 @@ const path = require('path');
 const ROOT = path.join(__dirname, '..');
 const SRC = path.join(ROOT, '_mirror-alt');
 const OUT = path.join(ROOT, 'v2');
+const ASSETS = path.join(ROOT, '_assets'); // eigene Overrides (z. B. KI-hochskalierte Bilder), werden nach dem Spiegel kopiert
 
 function load(f) {
   const b = fs.readFileSync(path.join(SRC, f));
@@ -18,9 +19,9 @@ function decodeEntities(s) {
   const map = { '&auml;': 'ä', '&ouml;': 'ö', '&uuml;': 'ü', '&Auml;': 'Ä', '&Ouml;': 'Ö', '&Uuml;': 'Ü', '&szlig;': 'ß', '&amp;': '&', '&quot;': '"', '&reg;': '®', '&copy;': '©', '&euro;': '€', '&nbsp;': ' ', '&#8211;': '–', '&#8220;': '“', '&#8221;': '”' };
   return String(s).replace(/&[a-zA-Z#0-9]+;/g, (m) => map[m] ?? m);
 }
-function img2x(rel) { // liefert srcset wenn eine @2x-Variante existiert
+function img2x(rel) { // liefert srcset wenn eine @2x-Variante existiert (Spiegel oder _assets-Overrides)
   const two = rel.replace(/\.(jpe?g|png|gif)$/i, '@2x.$1');
-  return fs.existsSync(path.join(SRC, two)) ? ` srcset="${rel} 1x, ${two} 2x"` : '';
+  return (fs.existsSync(path.join(SRC, two)) || fs.existsSync(path.join(ASSETS, two))) ? ` srcset="${rel} 1x, ${two} 2x"` : '';
 }
 
 /* ================= Daten aus dem Spiegel extrahieren ================= */
@@ -103,7 +104,7 @@ const KOOPS = ['pemanu', 'augartenhotel', 'maierhofer', 'rognerbad'].map((v) => 
   return { slug: v, url: big[1] || null, big: big[2] || `images/kooperationen/${v}_big.jpg`, logo: `images/kooperationen/${v}_logo.jpg` };
 });
 
-const HOME_SLIDES = ['images/intro1.jpg', 'images/intro2.jpg', 'images/intro_haende.jpg', 'images/intro3.jpg', 'images/intro4.jpg', 'images/intro5.jpg', 'images/intro6.jpg', 'images/intro8.jpg'];
+// Startseiten-Bild: nur noch das erste Slider-Motiv, KI-hochskaliert in _assets (900px + 1800px @2x)
 
 /* ============== Impressum: Original-Text, tote Technik-Abschnitte raus ============== */
 
@@ -215,14 +216,6 @@ fs.rmSync(OUT, { recursive: true, force: true });
 fs.mkdirSync(OUT, { recursive: true });
 
 // --- Startseite ---
-const slides = HOME_SLIDES.map((s, i) => {
-  const haende = s.includes('haende');
-  const overlay = haende
-    ? `<span class="slide-note"><a href="cliq.html">Wenn sich Hände verändern – mehr erfahren</a></span>` : '';
-  const alt = haende ? 'Wenn sich Hände verändern – das cliQ® Superfit System' : '';
-  return `      <div class="slide"><img src="${s}"${img2x(s)} alt="${alt}" ${i === 0 ? '' : 'loading="lazy"'}>${overlay}</div>`;
-}).join('\n');
-
 // Bewährte likebox-Variante wie auf der alten Live-Seite — page.php/timeline wird
 // von Meta für ausgeloggte Besucher oft nicht gerendert (grauer Fehler), likebox schon.
 const FB_FEED_SRC = 'https://www.facebook.com/plugins/likebox.php?href=https%3A%2F%2Fwww.facebook.com%2Fschmuckkulturweiss&width=300&height=560&colorscheme=light&show_faces=false&header=false&stream=true&show_border=false';
@@ -249,12 +242,7 @@ const homeContent = `  <div class="layout home-grid">
       </div>
     </aside>
     <div class="home-main">
-      <div class="slider" id="home-slider">
-${slides}
-        <button class="sl-arrow sl-prev" aria-label="Vorheriges Bild">‹</button>
-        <button class="sl-arrow sl-next" aria-label="Nächstes Bild">›</button>
-        <div class="sl-dots"></div>
-      </div>
+      <div class="hero-still"><img src="images/intro1.jpg"${img2x('images/intro1.jpg')} width="900" height="575" alt="Blick in unser Juweliergeschäft in Mödling"></div>
       <div class="home-text">
         <p>Ihr Juweliergeschäft in Mödling<br>
         Schmuckkultur RENATE WEISS Inh. Gabriele Golzar<br>
@@ -270,7 +258,6 @@ ${slides}
       </div>
     </div>
   </div>
-  <script src="slider.js" defer></script>
   <script>(function () {
     var b = document.getElementById('cookie-bar');
     try { if (localStorage.getItem('sk-cookiehinweis') === '1') { b.hidden = true; } } catch (e) {}
@@ -651,22 +638,9 @@ nav a.active { border-bottom-color: #000; }
 .cb-x { border: 0; background: none; font-size: 18px; line-height: 1; cursor: pointer; color: var(--muted); padding: 2px 6px; }
 .cb-x:hover { color: #000; }
 
-/* Slider */
-.slider { position: relative; overflow: hidden; background: #fff; aspect-ratio: 1.55; max-height: 560px; }
-.slider .slide { display: none; position: relative; height: 100%; }
-.slider .slide.on { display: block; }
-.slider .slide img { width: 100%; height: 100%; object-fit: cover; -webkit-user-drag: none; user-select: none; }
-.slide-note { position: absolute; right: 14px; bottom: 12px; background: rgba(255,255,255,0.92); padding: 6px 12px; font-size: 12px; }
-.sl-arrow {
-  position: absolute; top: 50%; transform: translateY(-50%);
-  border: 0; background: rgba(255,255,255,0.85); color: #111;
-  width: 42px; height: 42px; font-size: 24px; cursor: pointer; line-height: 1;
-}
-.sl-arrow:hover { background: #fff; }
-.sl-prev { left: 0; } .sl-next { right: 0; }
-.sl-dots { position: absolute; left: 0; right: 0; bottom: 10px; display: flex; justify-content: center; gap: 8px; }
-.sl-dots button { width: 9px; height: 9px; border-radius: 50%; border: 1px solid rgba(0,0,0,0.45); padding: 0; background: rgba(255,255,255,0.8); cursor: pointer; }
-.sl-dots button.on { background: #333; border-color: #333; }
+/* Startseiten-Bild (statisch, ehemals Slider) */
+.hero-still { background: #fff; }
+.hero-still img { display: block; width: 100%; height: auto; -webkit-user-drag: none; user-select: none; }
 
 /* Schmuck-Viewer */
 .viewer { min-width: 0; }
@@ -754,7 +728,6 @@ footer { display: flex; align-items: center; justify-content: space-between; bor
   .home-grid .home-main { order: 1; }
   .rail-designer { order: 2; }
   .cookie-bar { margin: 0 -20px; text-align: left; }
-  .slider .slide img { max-height: 340px; }
   .v-main img { max-height: 52vh; }
   .v-arrow { width: 40px; height: 40px; }
   .content-img img { max-width: 100%; }
@@ -764,43 +737,6 @@ footer { display: flex; align-items: center; justify-content: space-between; bor
 `);
 
 /* ================= JS ================= */
-
-fs.writeFileSync(path.join(OUT, 'slider.js'), `// Startseiten-Slider (ohne Fremdbibliotheken)
-(function () {
-  var root = document.getElementById('home-slider');
-  if (!root) return;
-  var slides = root.querySelectorAll('.slide');
-  var dotsBox = root.querySelector('.sl-dots');
-  var idx = 0, timer = null;
-  var still = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  slides.forEach(function (_, i) {
-    var b = document.createElement('button');
-    b.setAttribute('aria-label', 'Bild ' + (i + 1) + ' anzeigen');
-    b.addEventListener('click', function () { go(i); restart(); });
-    dotsBox.appendChild(b);
-  });
-  var dots = dotsBox.querySelectorAll('button');
-  function go(i) {
-    idx = (i + slides.length) % slides.length;
-    slides.forEach(function (s, j) { s.classList.toggle('on', j === idx); });
-    dots.forEach(function (d, j) { d.classList.toggle('on', j === idx); });
-  }
-  function restart() { clearInterval(timer); if (!still) timer = setInterval(function () { go(idx + 1); }, 4500); }
-  root.querySelector('.sl-prev').addEventListener('click', function () { go(idx - 1); restart(); });
-  root.querySelector('.sl-next').addEventListener('click', function () { go(idx + 1); restart(); });
-  root.addEventListener('mouseenter', function () { clearInterval(timer); });
-  root.addEventListener('mouseleave', restart);
-  var x0 = null;
-  root.addEventListener('pointerdown', function (e) { x0 = e.clientX; clearInterval(timer); });
-  root.addEventListener('pointerup', function (e) {
-    if (x0 === null) return;
-    var dx = e.clientX - x0; x0 = null;
-    if (Math.abs(dx) > 40) go(idx + (dx < 0 ? 1 : -1));
-    restart();
-  });
-  go(0); restart();
-})();
-`);
 
 fs.writeFileSync(path.join(OUT, 'viewer.js'), `// Schmuck-Viewer (ohne Fremdbibliotheken). Deep-Link: #p<ID>
 (function () {
@@ -904,6 +840,8 @@ function copyDir(src, dest) {
   }
 }
 copyDir(path.join(SRC, 'images'), path.join(OUT, 'images'));
+// _assets-Overrides zuletzt: eigene (z. B. KI-hochskalierte) Bilder ersetzen die Spiegel-Versionen
+if (fs.existsSync(path.join(ASSETS, 'images'))) copyDir(path.join(ASSETS, 'images'), path.join(OUT, 'images'));
 
 /* ================= Report ================= */
 const nProducts = Object.values(products).reduce((a, b) => a + b.length, 0);

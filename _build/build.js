@@ -152,8 +152,6 @@ const NAV = [
 const IG_URL = 'https://www.instagram.com/schmuckkultur.weiss';
 const FB_URL = 'https://www.facebook.com/schmuckkulturweiss';
 
-const ICON_IG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="2.5" y="2.5" width="19" height="19" rx="5"/><circle cx="12" cy="12" r="4.5"/><circle cx="17.6" cy="6.4" r="1.3" fill="currentColor" stroke="none"/></svg>';
-const ICON_FB = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M13.5 21v-7.6h2.55l.38-2.96H13.5V8.55c0-.86.24-1.44 1.47-1.44h1.57V4.46c-.27-.04-1.2-.12-2.29-.12-2.27 0-3.82 1.38-3.82 3.92v2.19H7.87v2.96h2.56V21h3.07z"/></svg>';
 
 function page({ file, title, desc, active, content, extraHead = '', bodyClass = '', preHeader = '' }) {
   const navItems = NAV.map(([href, label, key]) => `<a href="${href}"${key === active ? ' class="active"' : ''}>${label}</a>`).join('\n        ');
@@ -182,10 +180,6 @@ ${preHeader}  <header>
   </header>
 ${content}
   <footer>
-    <div class="social">
-      <a href="${IG_URL}" target="_blank" rel="noopener" aria-label="Instagram">${ICON_IG}</a>
-      <a href="${FB_URL}" target="_blank" rel="noopener" aria-label="Facebook">${ICON_FB}</a>
-    </div>
     <p class="foot-info">Schmuckkultur RENATE WEISS · Hauptstraße 71, 2340 Mödling · Di–Fr 9:30–12:30 &amp; 15:00–18:00 Uhr, Sa 9:30–12:30 Uhr</p>
     <p class="foot-links"><a href="impressum.html">Impressum</a> · <a href="impressum.html#datenschutz">Datenschutz</a></p>
   </footer>
@@ -695,10 +689,6 @@ nav a.active { border-bottom-color: #000; }
 
 /* Footer */
 footer { display: flex; align-items: center; justify-content: space-between; border-top: 1px solid var(--line); padding: 16px 0; }
-.social { display: flex; gap: 14px; }
-.social a { color: #7a7a7a; }
-.social a:hover { color: #000; }
-.social svg { width: 22px; height: 22px; }
 .foot-info { margin: 0; font-size: 12px; color: var(--muted); text-align: center; flex: 1; padding: 0 16px; }
 .foot-links { margin: 0; font-size: 12px; white-space: nowrap; }
 .foot-links a { color: var(--muted); }

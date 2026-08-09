@@ -232,7 +232,6 @@ const homeContent = `  <div class="layout home-grid">
           <iframe src="${esc(FB_FEED_SRC)}" height="560" style="height:560px" title="Facebook-Beiträge von Schmuckkultur Weiss" loading="lazy" allow="encrypted-media"></iframe>
         </div>
         <div class="feed-slot" id="feed-ig" hidden data-src="${esc(IG_FEED_SRC)}" data-h="560" data-title="Instagram-Profil von Schmuckkultur Weiss"></div>
-        <p class="feed-link"><a href="${FB_URL}" target="_blank" rel="noopener">Zur Facebook-Seite</a> · <a href="${IG_URL}" target="_blank" rel="noopener">Zum Instagram-Profil</a></p>
       </div>
     </aside>
     <div class="home-main">
@@ -623,7 +622,6 @@ nav a.active { border-bottom-color: #000; }
 .feed-slot { border: 1px solid var(--line); background: #fff; }
 .feed-slot[hidden] { display: none; }
 .feed-slot iframe { display: block; width: 100%; border: 0; }
-.feed-link { margin: 8px 0 0; font-size: 12px; }
 
 /* Cookie-Hinweis (nur Startseite, wegen Meta-Einbettungen) */
 .cookie-bar { display: flex; align-items: center; gap: 14px; justify-content: center; background: #f3f2ef; border-bottom: 1px solid var(--line); margin: 0 -44px; padding: 9px 20px; font-size: 12px; color: var(--muted); }

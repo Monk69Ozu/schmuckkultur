@@ -115,9 +115,9 @@ function buildImpressum() {
   c = c.replace(/<img[^>]*facebook\.com\/tr[^>]*>/g, '');
   // Datenschutz-Unterabschnitte entfernen, deren Technik es nicht mehr gibt.
   // Abschnitte sind mit <strong>Titel</strong> markiert — Block = ab diesem <strong> bis zum nächsten <strong>.
-  // 'Facebook Datenschutzerklärung' bleibt DRIN (Original-Text), weil die Startseite
-  // per 2-Klick-Lösung Facebook-/Instagram-Inhalte einbetten kann.
-  const DROP = ['Cookies', 'Google Maps Datenschutzerkl', 'Google Analytics Datenschutzerkl', 'Pseudonymisierung', 'Deaktivierung der Datenerfassung durch Google Analytics', 'Konversionsmessung mit dem Besucheraktions-Pixel von Facebook'];
+  // 'Cookies' und 'Facebook Datenschutzerklärung' bleiben DRIN (Original-Texte),
+  // weil die Startseite Facebook-/Instagram-Inhalte automatisch einbettet.
+  const DROP = ['Google Maps Datenschutzerkl', 'Google Analytics Datenschutzerkl', 'Pseudonymisierung', 'Deaktivierung der Datenerfassung durch Google Analytics', 'Konversionsmessung mit dem Besucheraktions-Pixel von Facebook'];
   const parts = c.split(/(?=<p><strong>|<strong>)/g);
   c = parts.filter((p) => {
     const sm = p.match(/<strong>([^<]+)<\/strong>/);
@@ -228,21 +228,23 @@ const slides = HOME_SLIDES.map((s, i) => {
 const FB_FEED_SRC = 'https://www.facebook.com/plugins/likebox.php?href=https%3A%2F%2Fwww.facebook.com%2Fschmuckkulturweiss&width=300&height=560&colorscheme=light&show_faces=false&header=false&stream=true&show_border=false';
 const IG_FEED_SRC = 'https://www.instagram.com/schmuckkultur.weiss/embed';
 
-const homeContent = `  <div class="layout home-grid">
+const homeContent = `  <div id="cookie-bar" class="cookie-bar">
+    <span>Diese Webseite verwendet Cookies durch eingebettete Facebook- und Instagram-Inhalte. Mit der Nutzung dieser Website erklären Sie sich einverstanden. <a href="impressum.html#datenschutz">Weitere Informationen</a></span>
+    <button type="button" class="cb-x" aria-label="Hinweis schließen">×</button>
+  </div>
+  <div class="layout home-grid">
     <aside class="side-feeds">
-      <div class="feed-card" data-src="${esc(FB_FEED_SRC)}" data-h="560" data-title="Facebook-Beiträge von Schmuckkultur Weiss">
+      <div class="feed-card">
         <h2>Aktuell auf Facebook</h2>
         <div class="feed-slot">
-          <button type="button" class="feed-load">${ICON_FB} Beiträge anzeigen</button>
-          <p class="feed-hint">Beim Anzeigen werden Inhalte von Facebook (Meta) geladen.</p>
+          <iframe src="${esc(FB_FEED_SRC)}" height="560" style="height:560px" title="Facebook-Beiträge von Schmuckkultur Weiss" loading="lazy" allow="encrypted-media"></iframe>
         </div>
         <p class="feed-link"><a href="${FB_URL}" target="_blank" rel="noopener">Zur Facebook-Seite</a></p>
       </div>
-      <div class="feed-card" data-src="${esc(IG_FEED_SRC)}" data-h="440" data-title="Instagram-Profil von Schmuckkultur Weiss">
+      <div class="feed-card">
         <h2>Aktuell auf Instagram</h2>
         <div class="feed-slot">
-          <button type="button" class="feed-load">${ICON_IG} Beiträge anzeigen</button>
-          <p class="feed-hint">Beim Anzeigen werden Inhalte von Instagram (Meta) geladen.</p>
+          <iframe src="${esc(IG_FEED_SRC)}" height="440" style="height:440px" title="Instagram-Profil von Schmuckkultur Weiss" loading="lazy" allow="encrypted-media"></iframe>
         </div>
         <p class="feed-link"><a href="${IG_URL}" target="_blank" rel="noopener">Zum Instagram-Profil</a></p>
       </div>
@@ -270,7 +272,14 @@ ${slides}
     </div>
   </div>
   <script src="slider.js" defer></script>
-  <script src="social.js" defer></script>`;
+  <script>(function () {
+    var b = document.getElementById('cookie-bar');
+    try { if (localStorage.getItem('sk-cookiehinweis') === '1') { b.hidden = true; return; } } catch (e) {}
+    b.querySelector('.cb-x').addEventListener('click', function () {
+      b.hidden = true;
+      try { localStorage.setItem('sk-cookiehinweis', '1'); } catch (e) {}
+    });
+  })();</script>`;
 
 fs.writeFileSync(path.join(OUT, 'index.html'), page({
   file: 'index.html',
@@ -573,16 +582,19 @@ nav a.active { border-bottom-color: #000; }
 .home-main { min-width: 0; }
 .home-text { max-width: 640px; margin-top: 26px; }
 
-/* Social-Feeds links (2-Klick: Inhalte von Meta laden erst nach Klick) */
+/* Social-Feeds links (Facebook/Instagram, laden automatisch wie im Original) */
 .side-feeds { display: flex; flex-direction: column; gap: 28px; }
 .feed-card h2 { font-size: 14px; margin: 0 0 10px; }
 .feed-slot { border: 1px solid var(--line); background: #fff; }
 .feed-slot iframe { display: block; width: 100%; border: 0; }
-.feed-load { display: flex; align-items: center; gap: 9px; width: 100%; border: 0; background: #fff; padding: 14px; font-size: 13px; font-family: inherit; color: #000; cursor: pointer; text-align: left; }
-.feed-load:hover { text-decoration: underline; }
-.feed-load svg { width: 18px; height: 18px; flex: 0 0 auto; }
-.feed-hint { margin: 0; padding: 0 14px 12px; font-size: 11px; color: var(--muted); }
 .feed-link { margin: 8px 0 0; font-size: 12px; }
+
+/* Cookie-Hinweis (nur Startseite, wegen Meta-Einbettungen) */
+.cookie-bar { display: flex; align-items: center; gap: 14px; justify-content: center; background: #f3f2ef; border-bottom: 1px solid var(--line); margin: 0 -44px; padding: 9px 20px; font-size: 12px; color: var(--muted); }
+.cookie-bar a { color: var(--link); }
+.cookie-bar[hidden] { display: none; }
+.cb-x { border: 0; background: none; font-size: 18px; line-height: 1; cursor: pointer; color: var(--muted); padding: 2px 6px; }
+.cb-x:hover { color: #000; }
 
 /* Slider */
 .slider { position: relative; overflow: hidden; background: #fff; aspect-ratio: 1.55; max-height: 560px; }
@@ -685,6 +697,7 @@ footer { display: flex; align-items: center; justify-content: space-between; bor
   .side-img img { margin-left: 0; max-width: 300px; }
   .home-grid .side-feeds { order: 2; max-width: 340px; margin: 0 auto; width: 100%; }
   .home-grid .home-main { order: 1; }
+  .cookie-bar { margin: 0 -20px; text-align: left; }
   .slider .slide img { max-height: 340px; }
   .v-main img { max-height: 52vh; }
   .v-arrow { width: 40px; height: 40px; }
@@ -813,39 +826,6 @@ fs.writeFileSync(path.join(OUT, 'viewer.js'), `// Schmuck-Viewer (ohne Fremdbibl
     if (f >= 0) start = f;
   }
   show(start, false);
-})();
-`);
-
-fs.writeFileSync(path.join(OUT, 'social.js'), `// Social-Feeds (Facebook/Instagram) — 2-Klick-Lösung:
-// Meta-Inhalte laden erst nach Klick; die Zustimmung wird lokal gemerkt.
-(function () {
-  var KEY = 'schmuckkultur-social-consent';
-  var cards = document.querySelectorAll('.feed-card');
-  if (!cards.length) return;
-  function loadCard(card) {
-    var slot = card.querySelector('.feed-slot');
-    if (!slot || slot.querySelector('iframe')) return;
-    var f = document.createElement('iframe');
-    f.src = card.getAttribute('data-src');
-    f.height = card.getAttribute('data-h') || '500';
-    f.title = card.getAttribute('data-title') || 'Social-Media-Beiträge';
-    f.loading = 'lazy';
-    f.setAttribute('allow', 'encrypted-media');
-    f.style.height = f.height + 'px';
-    slot.innerHTML = '';
-    slot.appendChild(f);
-  }
-  function loadAll() {
-    try { localStorage.setItem(KEY, '1'); } catch (e) {}
-    cards.forEach(loadCard);
-  }
-  cards.forEach(function (card) {
-    var btn = card.querySelector('.feed-load');
-    if (btn) btn.addEventListener('click', loadAll);
-  });
-  var ok = false;
-  try { ok = localStorage.getItem(KEY) === '1'; } catch (e) {}
-  if (ok) cards.forEach(loadCard);
 })();
 `);
 

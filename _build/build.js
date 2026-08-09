@@ -154,7 +154,7 @@ const FB_URL = 'https://www.facebook.com/schmuckkulturweiss';
 const ICON_IG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="2.5" y="2.5" width="19" height="19" rx="5"/><circle cx="12" cy="12" r="4.5"/><circle cx="17.6" cy="6.4" r="1.3" fill="currentColor" stroke="none"/></svg>';
 const ICON_FB = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M13.5 21v-7.6h2.55l.38-2.96H13.5V8.55c0-.86.24-1.44 1.47-1.44h1.57V4.46c-.27-.04-1.2-.12-2.29-.12-2.27 0-3.82 1.38-3.82 3.92v2.19H7.87v2.96h2.56V21h3.07z"/></svg>';
 
-function page({ file, title, desc, active, content, extraHead = '', bodyClass = '' }) {
+function page({ file, title, desc, active, content, extraHead = '', bodyClass = '', preHeader = '' }) {
   const navItems = NAV.map(([href, label, key]) => `<a href="${href}"${key === active ? ' class="active"' : ''}>${label}</a>`).join('\n        ');
   return `<!DOCTYPE html>
 <html lang="de">
@@ -169,7 +169,7 @@ function page({ file, title, desc, active, content, extraHead = '', bodyClass = 
 ${extraHead}</head>
 <body class="${bodyClass}">
 <div class="frame">
-  <header>
+${preHeader}  <header>
     <h1 class="brand">
       <a href="index.html" aria-label="Schmuckkultur Renate Weiss – Startseite"><img src="images/logo.jpg"${img2x('images/logo.jpg')} width="330" height="90" alt="Schmuckkultur Renate Weiss – Designschmuck Perlen"></a>
     </h1>
@@ -202,7 +202,7 @@ ${CATS.map((c) => `      <li><a href="schmuck-${c.slug}.html"${c.slug === active
 }
 
 function designerRail(activeSlug) {
-  return `<aside class="rail rail-logos" aria-label="Designer-Auswahl">
+  return `<aside class="rail rail-logos rail-designer" aria-label="Designer-Auswahl">
     <div class="logo-grid">
 ${designers.map((d) => `      <a href="designer-${d.slug}.html"${d.slug === activeSlug ? ' class="active"' : ''}><img src="${d.logo}"${img2x(d.logo)} width="85" height="83" alt="${esc(d.name)}" loading="lazy"></a>`).join('\n')}
     </div>
@@ -228,11 +228,13 @@ const slides = HOME_SLIDES.map((s, i) => {
 const FB_FEED_SRC = 'https://www.facebook.com/plugins/likebox.php?href=https%3A%2F%2Fwww.facebook.com%2Fschmuckkulturweiss&width=300&height=560&colorscheme=light&show_faces=false&header=false&stream=true&show_border=false';
 const IG_FEED_SRC = 'https://www.instagram.com/schmuckkultur.weiss/embed';
 
-const homeContent = `  <div id="cookie-bar" class="cookie-bar">
+const cookieBar = `  <div id="cookie-bar" class="cookie-bar">
     <span>Diese Webseite verwendet Cookies durch eingebettete Facebook- und Instagram-Inhalte. Mit der Nutzung dieser Website erklären Sie sich einverstanden. <a href="impressum.html#datenschutz">Weitere Informationen</a></span>
     <button type="button" class="cb-x" aria-label="Hinweis schließen">×</button>
   </div>
-  <div class="layout home-grid">
+`;
+
+const homeContent = `  <div class="layout home-grid">
     <aside class="side-feeds">
       <div class="feed-card">
         <h2>Aktuell auf Facebook</h2>
@@ -285,7 +287,7 @@ fs.writeFileSync(path.join(OUT, 'index.html'), page({
   file: 'index.html',
   title: 'Schmuckkultur Renate Weiss – Designschmuck Perlen Juwelier Mödling',
   desc: 'Kontinuierliche, authentische Schmucklinien mit handgefertigtem Schmuck von internationalen Designern – in unserem Juweliergeschäft in der Hauptstraße Mödling.',
-  active: null, content: homeContent, bodyClass: 'home',
+  active: null, content: homeContent, bodyClass: 'home', preHeader: cookieBar,
 }));
 
 // --- Firma ---
@@ -317,8 +319,7 @@ fs.writeFileSync(path.join(OUT, 'schmuck.html'), page({
   file: 'schmuck.html', title: 'Schmuck | Schmuckkultur Renate Weiss',
   desc: 'Ringe, Trauringe, Ohrschmuck, Halsschmuck, Perlen und mehr – Designschmuck bei Schmuckkultur Renate Weiss in Mödling.',
   active: 'schmuck',
-  content: `  <div class="layout">
-    ${schmuckRail(null)}
+  content: `  <div class="layout layout-full">
     <div class="cat-grid">
 ${catTiles}
     </div>
@@ -552,6 +553,7 @@ nav a.active { border-bottom-color: #000; }
   min-height: 460px;
 }
 .layout-single { grid-template-columns: minmax(0, 1fr); max-width: 860px; }
+.layout-full { grid-template-columns: minmax(0, 1fr); }
 
 /* Linke Spalte */
 .rail ul { list-style: none; margin: 0; padding: 0; text-align: right; }
@@ -695,8 +697,9 @@ footer { display: flex; align-items: center; justify-content: space-between; bor
   .logo-grid { justify-content: start; grid-template-columns: repeat(auto-fill, 72px); }
   .logo-grid img { width: 70px; height: 68px; }
   .side-img img { margin-left: 0; max-width: 300px; }
-  .home-grid .side-feeds { order: 2; max-width: 340px; margin: 0 auto; width: 100%; }
+  .home-grid .side-feeds { order: 2; max-width: 340px; width: 100%; }
   .home-grid .home-main { order: 1; }
+  .rail-designer { order: 2; }
   .cookie-bar { margin: 0 -20px; text-align: left; }
   .slider .slide img { max-height: 340px; }
   .v-main img { max-height: 52vh; }

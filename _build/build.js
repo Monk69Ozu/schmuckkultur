@@ -237,18 +237,15 @@ const cookieBar = `  <div id="cookie-bar" class="cookie-bar">
 const homeContent = `  <div class="layout home-grid">
     <aside class="side-feeds">
       <div class="feed-card">
-        <h2>Aktuell auf Facebook</h2>
-        <div class="feed-slot">
+        <div class="tab-row" role="tablist" aria-label="Soziale Netzwerke">
+          <button type="button" class="tab-btn on" data-feed="fb" role="tab" aria-selected="true">Facebook</button>
+          <button type="button" class="tab-btn" data-feed="ig" role="tab" aria-selected="false">Instagram</button>
+        </div>
+        <div class="feed-slot" id="feed-fb">
           <iframe src="${esc(FB_FEED_SRC)}" height="560" style="height:560px" title="Facebook-Beiträge von Schmuckkultur Weiss" loading="lazy" allow="encrypted-media"></iframe>
         </div>
-        <p class="feed-link"><a href="${FB_URL}" target="_blank" rel="noopener">Zur Facebook-Seite</a></p>
-      </div>
-      <div class="feed-card">
-        <h2>Aktuell auf Instagram</h2>
-        <div class="feed-slot">
-          <iframe src="${esc(IG_FEED_SRC)}" height="440" style="height:440px" title="Instagram-Profil von Schmuckkultur Weiss" loading="lazy" allow="encrypted-media"></iframe>
-        </div>
-        <p class="feed-link"><a href="${IG_URL}" target="_blank" rel="noopener">Zum Instagram-Profil</a></p>
+        <div class="feed-slot" id="feed-ig" hidden data-src="${esc(IG_FEED_SRC)}" data-h="560" data-title="Instagram-Profil von Schmuckkultur Weiss"></div>
+        <p class="feed-link"><a href="${FB_URL}" target="_blank" rel="noopener">Zur Facebook-Seite</a> · <a href="${IG_URL}" target="_blank" rel="noopener">Zum Instagram-Profil</a></p>
       </div>
     </aside>
     <div class="home-main">
@@ -276,10 +273,36 @@ ${slides}
   <script src="slider.js" defer></script>
   <script>(function () {
     var b = document.getElementById('cookie-bar');
-    try { if (localStorage.getItem('sk-cookiehinweis') === '1') { b.hidden = true; return; } } catch (e) {}
-    b.querySelector('.cb-x').addEventListener('click', function () {
+    try { if (localStorage.getItem('sk-cookiehinweis') === '1') { b.hidden = true; } } catch (e) {}
+    if (!b.hidden) b.querySelector('.cb-x').addEventListener('click', function () {
       b.hidden = true;
       try { localStorage.setItem('sk-cookiehinweis', '1'); } catch (e) {}
+    });
+
+    // Social-Reiter: Facebook standardmäßig, Instagram lädt beim ersten Wechsel
+    var tabs = document.querySelectorAll('.tab-btn');
+    var fb = document.getElementById('feed-fb');
+    var ig = document.getElementById('feed-ig');
+    tabs.forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var showIg = btn.getAttribute('data-feed') === 'ig';
+        tabs.forEach(function (x) {
+          var on = x === btn;
+          x.classList.toggle('on', on);
+          x.setAttribute('aria-selected', on ? 'true' : 'false');
+        });
+        fb.hidden = showIg;
+        ig.hidden = !showIg;
+        if (showIg && !ig.querySelector('iframe')) {
+          var f = document.createElement('iframe');
+          f.src = ig.getAttribute('data-src');
+          f.height = ig.getAttribute('data-h');
+          f.style.height = f.height + 'px';
+          f.title = ig.getAttribute('data-title');
+          f.setAttribute('allow', 'encrypted-media');
+          ig.appendChild(f);
+        }
+      });
     });
   })();</script>`;
 
@@ -584,10 +607,14 @@ nav a.active { border-bottom-color: #000; }
 .home-main { min-width: 0; }
 .home-text { max-width: 640px; margin-top: 26px; }
 
-/* Social-Feeds links (Facebook/Instagram, laden automatisch wie im Original) */
-.side-feeds { display: flex; flex-direction: column; gap: 28px; }
-.feed-card h2 { font-size: 14px; margin: 0 0 10px; }
+/* Social-Feeds links: EIN Kasten mit Facebook/Instagram-Reitern */
+.side-feeds { display: flex; flex-direction: column; }
+.tab-row { display: flex; gap: 24px; margin: 0 0 10px; }
+.tab-btn { border: 0; background: none; font-family: inherit; font-size: 14px; color: var(--muted); padding: 4px 0; border-bottom: 2px solid transparent; cursor: pointer; text-transform: lowercase; letter-spacing: 0.02em; }
+.tab-btn:hover { color: #000; }
+.tab-btn.on { color: #000; border-bottom-color: #000; }
 .feed-slot { border: 1px solid var(--line); background: #fff; }
+.feed-slot[hidden] { display: none; }
 .feed-slot iframe { display: block; width: 100%; border: 0; }
 .feed-link { margin: 8px 0 0; font-size: 12px; }
 

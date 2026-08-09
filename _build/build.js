@@ -115,7 +115,9 @@ function buildImpressum() {
   c = c.replace(/<img[^>]*facebook\.com\/tr[^>]*>/g, '');
   // Datenschutz-Unterabschnitte entfernen, deren Technik es nicht mehr gibt.
   // Abschnitte sind mit <strong>Titel</strong> markiert — Block = ab diesem <strong> bis zum nächsten <strong>.
-  const DROP = ['Cookies', 'Google Maps Datenschutzerkl', 'Google Analytics Datenschutzerkl', 'Pseudonymisierung', 'Deaktivierung der Datenerfassung durch Google Analytics', 'Facebook Datenschutzerkl', 'Konversionsmessung mit dem Besucheraktions-Pixel von Facebook'];
+  // 'Facebook Datenschutzerklärung' bleibt DRIN (Original-Text), weil die Startseite
+  // per 2-Klick-Lösung Facebook-/Instagram-Inhalte einbetten kann.
+  const DROP = ['Cookies', 'Google Maps Datenschutzerkl', 'Google Analytics Datenschutzerkl', 'Pseudonymisierung', 'Deaktivierung der Datenerfassung durch Google Analytics', 'Konversionsmessung mit dem Besucheraktions-Pixel von Facebook'];
   const parts = c.split(/(?=<p><strong>|<strong>)/g);
   c = parts.filter((p) => {
     const sm = p.match(/<strong>([^<]+)<\/strong>/);
@@ -221,17 +223,29 @@ const slides = HOME_SLIDES.map((s, i) => {
   return `      <div class="slide"><img src="${s}"${img2x(s)} alt="${alt}" ${i === 0 ? '' : 'loading="lazy"'}>${overlay}</div>`;
 }).join('\n');
 
+// Bewährte likebox-Variante wie auf der alten Live-Seite — page.php/timeline wird
+// von Meta für ausgeloggte Besucher oft nicht gerendert (grauer Fehler), likebox schon.
+const FB_FEED_SRC = 'https://www.facebook.com/plugins/likebox.php?href=https%3A%2F%2Fwww.facebook.com%2Fschmuckkulturweiss&width=300&height=560&colorscheme=light&show_faces=false&header=false&stream=true&show_border=false';
+const IG_FEED_SRC = 'https://www.instagram.com/schmuckkultur.weiss/embed';
+
 const homeContent = `  <div class="layout home-grid">
-    <aside class="side-card">
-      <h2>Besuchen Sie uns</h2>
-      <p>Schmuckkultur RENATE WEISS<br>Inh. Gabriele Golzar<br>Hauptstraße 71<br>2340 Mödling</p>
-      <h2>Öffnungszeiten</h2>
-      <p>Di – Fr: 9:30 – 12:30 Uhr<br>und 15:00 – 18:00 Uhr<br>Sa: 9:30 – 12:30 Uhr</p>
-      <h2>Folgen Sie uns</h2>
-      <p class="social-btns">
-        <a class="btn-social" href="${IG_URL}" target="_blank" rel="noopener">${ICON_IG} Instagram</a>
-        <a class="btn-social" href="${FB_URL}" target="_blank" rel="noopener">${ICON_FB} Facebook</a>
-      </p>
+    <aside class="side-feeds">
+      <div class="feed-card" data-src="${esc(FB_FEED_SRC)}" data-h="560" data-title="Facebook-Beiträge von Schmuckkultur Weiss">
+        <h2>Aktuell auf Facebook</h2>
+        <div class="feed-slot">
+          <button type="button" class="feed-load">${ICON_FB} Beiträge anzeigen</button>
+          <p class="feed-hint">Beim Anzeigen werden Inhalte von Facebook (Meta) geladen.</p>
+        </div>
+        <p class="feed-link"><a href="${FB_URL}" target="_blank" rel="noopener">Zur Facebook-Seite</a></p>
+      </div>
+      <div class="feed-card" data-src="${esc(IG_FEED_SRC)}" data-h="440" data-title="Instagram-Profil von Schmuckkultur Weiss">
+        <h2>Aktuell auf Instagram</h2>
+        <div class="feed-slot">
+          <button type="button" class="feed-load">${ICON_IG} Beiträge anzeigen</button>
+          <p class="feed-hint">Beim Anzeigen werden Inhalte von Instagram (Meta) geladen.</p>
+        </div>
+        <p class="feed-link"><a href="${IG_URL}" target="_blank" rel="noopener">Zum Instagram-Profil</a></p>
+      </div>
     </aside>
     <div class="home-main">
       <div class="slider" id="home-slider">
@@ -255,7 +269,8 @@ ${slides}
       </div>
     </div>
   </div>
-  <script src="slider.js" defer></script>`;
+  <script src="slider.js" defer></script>
+  <script src="social.js" defer></script>`;
 
 fs.writeFileSync(path.join(OUT, 'index.html'), page({
   file: 'index.html',
@@ -557,10 +572,17 @@ nav a.active { border-bottom-color: #000; }
 .home-grid { grid-template-columns: 300px minmax(0, 1fr); }
 .home-main { min-width: 0; }
 .home-text { max-width: 640px; margin-top: 26px; }
-.social-btns { display: flex; flex-direction: column; gap: 10px; align-items: flex-start; }
-.btn-social { display: inline-flex; align-items: center; gap: 9px; border: 1px solid var(--line); padding: 9px 16px; color: #000; font-size: 13px; }
-.btn-social:hover { border-color: #000; text-decoration: none; }
-.btn-social svg { width: 17px; height: 17px; }
+
+/* Social-Feeds links (2-Klick: Inhalte von Meta laden erst nach Klick) */
+.side-feeds { display: flex; flex-direction: column; gap: 28px; }
+.feed-card h2 { font-size: 14px; margin: 0 0 10px; }
+.feed-slot { border: 1px solid var(--line); background: #fff; }
+.feed-slot iframe { display: block; width: 100%; border: 0; }
+.feed-load { display: flex; align-items: center; gap: 9px; width: 100%; border: 0; background: #fff; padding: 14px; font-size: 13px; font-family: inherit; color: #000; cursor: pointer; text-align: left; }
+.feed-load:hover { text-decoration: underline; }
+.feed-load svg { width: 18px; height: 18px; flex: 0 0 auto; }
+.feed-hint { margin: 0; padding: 0 14px 12px; font-size: 11px; color: var(--muted); }
+.feed-link { margin: 8px 0 0; font-size: 12px; }
 
 /* Slider */
 .slider { position: relative; overflow: hidden; background: #fff; aspect-ratio: 1.55; max-height: 560px; }
@@ -661,7 +683,7 @@ footer { display: flex; align-items: center; justify-content: space-between; bor
   .logo-grid { justify-content: start; grid-template-columns: repeat(auto-fill, 72px); }
   .logo-grid img { width: 70px; height: 68px; }
   .side-img img { margin-left: 0; max-width: 300px; }
-  .home-grid .side-card { order: 2; }
+  .home-grid .side-feeds { order: 2; max-width: 340px; margin: 0 auto; width: 100%; }
   .home-grid .home-main { order: 1; }
   .slider .slide img { max-height: 340px; }
   .v-main img { max-height: 52vh; }
@@ -791,6 +813,39 @@ fs.writeFileSync(path.join(OUT, 'viewer.js'), `// Schmuck-Viewer (ohne Fremdbibl
     if (f >= 0) start = f;
   }
   show(start, false);
+})();
+`);
+
+fs.writeFileSync(path.join(OUT, 'social.js'), `// Social-Feeds (Facebook/Instagram) — 2-Klick-Lösung:
+// Meta-Inhalte laden erst nach Klick; die Zustimmung wird lokal gemerkt.
+(function () {
+  var KEY = 'schmuckkultur-social-consent';
+  var cards = document.querySelectorAll('.feed-card');
+  if (!cards.length) return;
+  function loadCard(card) {
+    var slot = card.querySelector('.feed-slot');
+    if (!slot || slot.querySelector('iframe')) return;
+    var f = document.createElement('iframe');
+    f.src = card.getAttribute('data-src');
+    f.height = card.getAttribute('data-h') || '500';
+    f.title = card.getAttribute('data-title') || 'Social-Media-Beiträge';
+    f.loading = 'lazy';
+    f.setAttribute('allow', 'encrypted-media');
+    f.style.height = f.height + 'px';
+    slot.innerHTML = '';
+    slot.appendChild(f);
+  }
+  function loadAll() {
+    try { localStorage.setItem(KEY, '1'); } catch (e) {}
+    cards.forEach(loadCard);
+  }
+  cards.forEach(function (card) {
+    var btn = card.querySelector('.feed-load');
+    if (btn) btn.addEventListener('click', loadAll);
+  });
+  var ok = false;
+  try { ok = localStorage.getItem(KEY) === '1'; } catch (e) {}
+  if (ok) cards.forEach(loadCard);
 })();
 `);
 

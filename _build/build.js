@@ -135,6 +135,7 @@ function buildImpressum() {
   if (!/id="datenschutz"/.test(c)) {
     c = c.replace(/<h2([^>]*)>(\s*Datenschutz\s*)<\/h2>/, '<h2$1 id="datenschutz">$2</h2>');
   }
+  c = c.replace(/Konzept und Umsetzung: Benjamin Nussbaum &copy; 2012/, 'Konzept und Umsetzung: WebArs e.U. – <a href="https://webars.at" target="_blank" rel="noopener">webars.at</a>');
   return c;
 }
 
@@ -236,6 +237,7 @@ const homeContent = `  <div class="layout home-grid">
     </aside>
     <div class="home-main">
       <div class="hero-still"><img src="images/intro1.jpg"${img2x('images/intro1.jpg')} width="900" height="575" alt="Blick in unser Juweliergeschäft in Mödling"></div>
+      <p class="hero-note"><a href="cliq.html">Wenn sich Hände verändern – mehr erfahren</a></p>
       <div class="home-text">
         <p>Ihr Juweliergeschäft in Mödling<br>
         Schmuckkultur RENATE WEISS Inh. Gabriele Golzar<br>
@@ -358,7 +360,7 @@ ${catTiles}
 // --- Schmuckviewer je Kategorie ---
 for (const c of CATS) {
   const items = products[c.slug];
-  const data = items.map((p) => ({ id: p.id, img: p.img, img2x: fs.existsSync(path.join(SRC, p.img.replace(/\.jpg$/i, '@2x.jpg'))) ? p.img.replace(/\.jpg$/i, '@2x.jpg') : null, thumb: p.thumb, d: p.designerName, ds: p.designerSlug, b: p.beschreibung, pr: p.preis }));
+  const data = items.map((p) => ({ id: p.id, img: p.img, img2x: fs.existsSync(path.join(SRC, p.img.replace(/\.jpg$/i, '@2x.jpg'))) ? p.img.replace(/\.jpg$/i, '@2x.jpg') : null, thumb: p.thumb, d: p.designerName, ds: p.designerSlug, b: p.beschreibung })); // Preise bewusst nicht ausgeben (Stand 2012, Entscheidung Teodor 10.08.2026)
   const thumbs = items.map((p, i) => `        <button data-i="${i}" aria-label="Bild ${i + 1}"><img src="${p.thumb}" width="85" height="83" alt="" loading="lazy"></button>`).join('\n');
   const content = `  <div class="layout">
     ${schmuckRail(c.slug)}
@@ -468,7 +470,6 @@ const LINKS = [
   ['PEMANU – Modedesign für Individualisten', 'http://www.pemanu.at'],
   ['apm ARCHITEKTEN PODIVIN & MARGINTER', 'http://www.apm.co.at'],
   ['Bioresonanzpraxis – Mag. Gabriele Plötzeneder', 'http://www.bioresonanzpraxis.com'],
-  ['Möbeldesign & Innenbau Felzmann & Partner', 'http://www.felzmann.com'],
   ['Ihr Wellnesshotel in der Steiermark Rogner Bad Blumau', 'http://www.blumau.com'],
 ];
 fs.writeFileSync(path.join(OUT, 'links.html'), page({
@@ -495,13 +496,12 @@ fs.writeFileSync(path.join(OUT, 'kontakt.html'), page({
       <p>RENATE WEISS Inhaberin Gabriele Golzar<br>
       Hauptstraße 71<br>
       2340 Mödling<br>
-      <a href="https://maps.google.at/maps?q=renate+weiss&amp;hl=de&amp;sll=48.08255,16.2869&amp;sspn=0.058716,0.115271&amp;hq=renate+weiss&amp;t=m&amp;z=14&amp;iwloc=A" target="_blank" rel="noopener">Karte anzeigen</a></p>
+      <a href="https://www.google.com/maps/search/?api=1&amp;query=Schmuckkultur%20Renate%20Weiss%2C%20Hauptstra%C3%9Fe%2071%2C%202340%20M%C3%B6dling" target="_blank" rel="noopener">Karte anzeigen</a></p>
       <h2>Öffnungszeiten</h2>
       <p>Di – Fr: 9:30 – 12:30 Uhr und 15:00 – 18:00 Uhr<br>
       Sa: 9:30 – 12:30 Uhr</p>
       <h2>Kontakt</h2>
       <p>tel: <a href="tel:+43223622790">+43 (2236) 2 27 90</a><br>
-      fax: +43 (2236) 2 99 50<br>
       <a href="mailto:info@schmuckkultur.at">info@schmuckkultur.at</a><br>
       <a href="${IG_URL}" target="_blank" rel="noopener">Instagram</a> · <a href="${FB_URL}" target="_blank" rel="noopener">Facebook</a></p>
       <h2>vCard</h2>
@@ -633,6 +633,8 @@ nav a.active { border-bottom-color: #000; }
 /* Startseiten-Bild (statisch, ehemals Slider) */
 .hero-still { background: #fff; }
 .hero-still img { display: block; width: 100%; height: auto; -webkit-user-drag: none; user-select: none; }
+.hero-note { margin: 8px 0 0; font-size: 12px; color: var(--muted); text-align: right; }
+.hero-note a { color: inherit; }
 
 /* Schmuck-Viewer */
 .viewer { min-width: 0; }
@@ -742,7 +744,6 @@ fs.writeFileSync(path.join(OUT, 'viewer.js'), `// Schmuck-Viewer (ohne Fremdbibl
     var parts = [];
     if (p.d) parts.push('Designer: ' + (p.ds ? '<a href="designer-' + esc(p.ds) + '.html">' + esc(p.d) + '</a>' : esc(p.d)));
     if (p.b) parts.push('Beschreibung: ' + esc(p.b));
-    if (p.pr) parts.push('Preis: ' + esc(p.pr));
     parts.push((idx + 1) + ' / ' + items.length);
     return parts.join(' &nbsp;·&nbsp; ');
   }

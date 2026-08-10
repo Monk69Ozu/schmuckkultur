@@ -16,6 +16,25 @@ function* walk(dir) {
 }
 
 (async () => {
+  // Designer-/Kooperations-"big"-Bilder: 2012er-Assets sind bis zu 96% leere weiße
+  // Fläche um ein kleines Logo — weißen Rand wegschneiden, sonst entsteht auf den
+  // Seiten (v. a. mobil) ein riesiger leerer Block.
+  let trimmed = 0;
+  for (const sub of ['designer', 'kooperationen']) {
+    const dir = path.join(IMG, sub);
+    if (!fs.existsSync(dir)) continue;
+    for (const name of fs.readdirSync(dir)) {
+      if (!/_big/i.test(name) || !/\.jpe?g$/i.test(name)) continue;
+      const p = path.join(dir, name);
+      try {
+        const buf = await sharp(p).trim({ threshold: 25 }).toBuffer();
+        fs.writeFileSync(p, buf);
+        trimmed++;
+      } catch {} // z. B. randloses Foto ohne beschneidbaren Rand — unverändert lassen
+    }
+  }
+  console.log(`big-Bilder beschnitten: ${trimmed}`);
+
   let before = 0, after = 0, done = 0, skipped = 0, failed = 0;
   for (const f of walk(IMG)) {
     const orig = fs.readFileSync(f);
